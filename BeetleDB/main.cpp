@@ -6,7 +6,7 @@
 //
 #include <iostream>
 #include <string>
-
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/timer.hpp>
 
@@ -22,11 +22,35 @@ int main()
 	string line;        //input line
 	size_t end;         //end pos
 	Interpreter BeetleInterpreter;
-
+	int n = 100;
 	while (true)
 	{
-		cout << endl << "BeetleDB> ";
-		getline(cin, line);
+		
+		std::ostringstream oss;
+		std::string id = "";
+		std::string ss = "";
+		int a = 200 - n;
+		float s = (float)(200 - n) / 2;
+		oss << a;
+		id += oss.str();
+		oss.clear();
+		oss << s;
+		ss += oss.str();
+
+		if (n == 100) {
+			line = "use SystemForTest;";
+			n--;
+		}
+		else if(n) {
+			line = "insert into T values(" + id + "," + ss + ",'KKL');";
+			n--;
+		}
+		else {
+			cout<< endl << "BeetleDB> ";
+			getline(cin, line);
+		}
+	
+	
 		
 		sql = string(line);
 		if (sql == "") { continue; } /* Only is an empty input line */
