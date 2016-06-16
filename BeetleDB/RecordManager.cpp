@@ -202,7 +202,7 @@ void RecordManager::Select(SQLSelect& st)
 			Index *idx = tb->GetIndex(i);
 			for (auto j = 0; j < st.GetWheres().size(); j++)
 			{
-				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type == SIGN_EQ)
+				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type !=SIGN_NE)//xj:forB+tree,pre:== SIGN_EQ
 				{
 					has_index = true;
 					index_idx = i;
@@ -245,25 +245,30 @@ void RecordManager::Select(SQLSelect& st)
 		TKey dest_key(type, length);
 		dest_key.ReadValue(value);
 
-		int blocknum = tree.GetVal(dest_key);
-
-		if (blocknum != -1)
-		{
-			/* shift offset */
-			int blockoffset = blocknum;
-			blocknum = blocknum >> 16;
-			blocknum = blocknum && 0xffff;
-			blockoffset = blockoffset & 0xffff;
-
-			vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
-			bool sats = true;
-			for (auto k = 0; k < st.GetWheres().size(); k++)
+		//单值查询与范围查询 分支
+		vector<int> blocknumList = tree.GetVal(dest_key, st.GetWheres()[where_idx].op_type);
+		//int blocknum = tree.GetVal(dest_key);
+		//xj:得到查询结果集合
+		for (auto bnum = blocknumList.begin(); bnum != blocknumList.end(); bnum++) {
+			int blocknum = (*bnum);
+			if (blocknum != -1)
 			{
-				SQLWhere where = st.GetWheres()[k];
-				if (!SatisfyWhere(tb, tuple, where)) sats = false;
+				/* shift offset */
+				int blockoffset = blocknum;
+				blocknum = blocknum >> 16;
+				blocknum = blocknum && 0xffff;
+				blockoffset = blockoffset & 0xffff;
+
+				vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
+				bool sats = true;
+				for (auto k = 0; k < st.GetWheres().size(); k++)
+				{
+					SQLWhere where = st.GetWheres()[k];
+					if (!SatisfyWhere(tb, tuple, where)) sats = false;
+				}
+				if (sats) tuples.push_back(tuple);
 			}
-			if (sats) tuples.push_back(tuple);
-		}
+		}		
 	}
 	if (tuples.size() == 0)
 	{

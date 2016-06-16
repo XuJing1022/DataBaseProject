@@ -26,7 +26,7 @@ int main()
 	while (true)
 	{
 		
-		std::ostringstream oss;
+		/*std::ostringstream oss;
 		std::string id = "";
 		std::string ss = "";
 		int a = 200 - n;
@@ -45,7 +45,8 @@ int main()
 			line = "insert into T values(" + id + "," + ss + ",'KKL');";
 			n--;
 		}
-		else {
+		else*/
+		{
 			cout<< endl << "BeetleDB> ";
 			getline(cin, line);
 		}

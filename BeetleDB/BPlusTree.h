@@ -49,6 +49,7 @@ public:
 	BPlusTreeNode* GetNode(int num);						/*获取第num个节点。实现方法：获取文件系统中第num个块，该块中的data_数据即为该节点*/
 
 	int GetVal(TKey key);									/*由key查询value值*/
+	vector<int> GetVal(TKey key, int op_type);				/*由key查询value值，op_type可用于判定是否为范围查询*/
 	int GetNewBlockNum();									/*idx_索引最大值增一*/
 
 	void Print();
