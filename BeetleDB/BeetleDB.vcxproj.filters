@@ -18,9 +18,6 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Interpreter.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="API.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -57,18 +54,15 @@
     <ClCompile Include="FileHandle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="QueryParser.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Interpreter.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="API.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Exceptions.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="StaticValue.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="CatalogManager.h">
@@ -101,9 +95,15 @@
     <ClInclude Include="FileHandle.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="ConstValue.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="QueryParser.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="name_rule">
+    <None Include="rule">
       <Filter>资源文件</Filter>
     </None>
   </ItemGroup>

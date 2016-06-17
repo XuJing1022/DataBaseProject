@@ -91,7 +91,7 @@
     <ClCompile Include="FileHandle.cpp" />
     <ClCompile Include="FileInfo.cpp" />
     <ClCompile Include="IndexManager.cpp" />
-    <ClCompile Include="Interpreter.cpp" />
+    <ClCompile Include="QueryParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RecordManager.cpp" />
     <ClCompile Include="SQLStatement.cpp" />
@@ -107,13 +107,13 @@
     <ClInclude Include="FileHandle.h" />
     <ClInclude Include="FileInfo.h" />
     <ClInclude Include="IndexManager.h" />
-    <ClInclude Include="Interpreter.h" />
+    <ClInclude Include="QueryParser.h" />
     <ClInclude Include="RecordManager.h" />
     <ClInclude Include="SQLStatement.h" />
-    <ClInclude Include="StaticValue.h" />
+    <ClInclude Include="ConstValue.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="name_rule" />
+    <None Include="rule" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

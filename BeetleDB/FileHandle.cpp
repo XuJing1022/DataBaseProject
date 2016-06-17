@@ -1,19 +1,14 @@
-//
-// FileHandle.cpp
-//
-// Created by Chenbjin on 2015/12/24.
-// Copyright(C) 2015, Chenbjin. All rights reserved.
-//
+//Implemented by Lai ZhengMin
 #include "FileHandle.h"
 
-
+//implement LRU Algorithm
 FileHandle::FileHandle(string p)
 {
 	first_file_ = new FileInfo();
 	path_ = p;
 }
 
-FileHandle::~FileHandle(void)
+FileHandle::~FileHandle()
 {
 	WriteToDisk();
 	FileInfo* fp = first_file_;
@@ -55,14 +50,15 @@ BlockInfo* FileHandle::GetBlockInfo(FileInfo* file, int block_pos)
 	}
 	return NULL;
 }
-
-/* LRU algorithm to recycle block */
-BlockInfo* FileHandle::RecycleBlock()
+//LRU算法返回该表所包含的所有文件中最老的块的指针（最近最少使用的块）
+BlockInfo* FileHandle::LRUAlgorithm()
 {
 	FileInfo* fp = first_file_;
+	//最老的块的前一块
 	BlockInfo* oldestbefore = NULL;
+	//最老的块
 	BlockInfo* oldest = fp->GetFirstBlock();
-	
+	//找到最老的块
 	while (fp != NULL)
 	{
 		BlockInfo* bpbefore = NULL;
@@ -79,15 +75,17 @@ BlockInfo* FileHandle::RecycleBlock()
 		}
 		fp = fp->GetNext();
 	}
-
-	if (oldest->get_dirty()) oldest->WriteInfo(path_);
-
+	//如果最老的块被修改过，则把它的内容写回文件
+	if (oldest->get_dirty())
+		oldest->WriteInfo(path_);
+	//如果最老的块的前一位置是空块，则说明第一块就是最老的块。这时因为要移除oldest，所有该文件第一块就变成了oldest->next
 	if (oldestbefore == NULL) oldest->GetFile()->SetFirstBlock(oldest->GetNext());
 	else oldestbefore->SetNext(oldest->GetNext());
-
+	//将最老的块年龄重置为0
 	oldest->ResetAge();
+	//oldest的next置为null
 	oldest->SetNext(NULL);
-
+	//返回最老的块的指针
 	return oldest;
 }
 
@@ -140,6 +138,7 @@ void FileHandle::WriteToDisk()
 		BlockInfo* bp = fp->GetFirstBlock();
 		while (bp != NULL)
 		{
+			//如果该块被修改过，则写到文件中
 			if (bp->get_dirty())
 			{
 				bp->WriteInfo(path_);
@@ -150,4 +149,3 @@ void FileHandle::WriteToDisk()
 		fp = fp->GetNext();
 	}
 }
-

@@ -1,35 +1,35 @@
-//
-// RecordManager.cpp
-//
-// Created by Chenbjin on 2015/12/18.
-// Copyright(C) 2015, Chenbjin. All rights reserved.
-//
+//Implemented by Lai ZhengMin & XuJing
+
+//定长记录=sum(属性),块的编号是从大到小的(block->preNum=block->getNum()+1)
 #include "RecordManager.h"
 #include "BPlusTree.h"
-#include "StaticValue.h"
+#include "ConstValue.h"
 #include<iostream>
 #include <iomanip>
-using namespace std;
-RecordManager::RecordManager(CatalogManager *cm, BufferManager *bm, string dbname):catalog_m_(cm), buffer_m_(bm), db_name_(dbname) {}
+using std::cout;
 
-RecordManager::~RecordManager(void){}
+RecordManager::RecordManager(CatalogManager *cm, BufferManager *bm, string dbname) :catalog_m_(cm), buffer_m_(bm), db_name_(dbname) {}
+
+RecordManager::~RecordManager(void) {}
 
 void RecordManager::Insert(SQLInsert& st)
 {
 	string tb_name = st.get_tb_name();
-	auto values_size = st.GetValues().size();
-	/* get table */
+	//这个待插记录有多少个key value
+	int values_size = st.GetValues().size();
+	//根据表名，从目录文件下拿到数据库中的表
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(tb_name);
 	if (tb == NULL) throw TableNotExistException();
 
-	/* each block 4K, block head 12bits */
-	int max_count = (4096-12)/(tb->get_record_length());
-	
+	//一块（4K，头12 bytes）能装多少个记录（tuple）
+	int max_count = (4096 - 12) / (tb->get_record_length());
+
 	vector<TKey> tkey_values;
+
 	int primary_key_index = -1;
 
-	/* get every value, change to Tkey object */
-	for (auto i = 0; i < values_size; i++)
+	//遍历待插记录，看是否有主键，并把数据类型和键值存到tkey_values中
+	for (int i = 0; i < values_size; i++)
 	{
 		int value_type = st.GetValues()[i].data_type;
 		string value = st.GetValues()[i].value;
@@ -37,31 +37,36 @@ void RecordManager::Insert(SQLInsert& st)
 
 		TKey tmp(value_type, length);
 		tmp.ReadValue(value.c_str());
-		
+
 		tkey_values.push_back(tmp);
-		if (tb->GetAttributes()[i].get_attr_type() == 1) 
+		if (tb->GetAttributes()[i].get_attr_type() == 1)
 			primary_key_index = i;
 	}
-	
+	//如果有主键
 	if (primary_key_index != -1)
 	{
-		/* check index */
+		//如果有索引
 		if (tb->GetIndexNum() != 0)
 		{
 			BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
 			if (tree.GetVal(tkey_values[primary_key_index]) != -1)
 				throw PrimaryKeyConflictException();
 		}
+		//无索引
 		else
 		{
-			/* check if record exist */
+			//拿到该表的起始块号 
 			int block_num = tb->get_first_block_num();
+			//遍历表中的块，看插入的数据是否会发生主键冲突
 			for (int i = 0; i < tb->get_block_count(); i++)
 			{
+				//拿到该块号对应的块信息
 				BlockInfo *bp = GetBlockInfo(tb, block_num);
 				for (int j = 0; j < bp->GetRecordCount(); j++)
 				{
-					vector<TKey> tuple = GetRecord(tb, block_num,j);
+					//拿到块内的第j个记录
+					vector<TKey> tuple = GetRecord(tb, block_num, j);
+					//如果主键属性值发生冲突
 					if (tuple[primary_key_index] == tkey_values[primary_key_index])
 						throw PrimaryKeyConflictException();
 				}
@@ -70,34 +75,42 @@ void RecordManager::Insert(SQLInsert& st)
 		}
 	}
 	char *content;
+	//可用块的起始块号
 	int use_block = tb->get_first_block_num();
+	//垃圾块的起始块号
 	int first_rubbish_block = tb->get_first_rubbish_num();
+	//记录上一次使用的块
 	int last_use_block;
 	int blocknum, offset;
-	//find the useful block
+	//无可用块
 	while (use_block != -1)
 	{
 		last_use_block = use_block;
 		BlockInfo *bp = GetBlockInfo(tb, use_block);
-		
-		if (bp->GetRecordCount() == max_count) /* this block is full */
+		//块满了
+		if (bp->GetRecordCount() == max_count)
 		{
 			use_block = bp->GetNextBlockNum();
 			continue;
 		}
-		content = bp->GetContentAdress() + bp->GetRecordCount() * tb->get_record_length(); /* get content */
-		for (auto iter = tkey_values.begin(); iter  != tkey_values.end(); iter ++)
+		//未满，则往record尾部插入记录
+		content = bp->GetContentAdress() + bp->GetRecordCount() * tb->get_record_length();
+		//复制一个tuple，也就是从块的空闲位置插入一个tuple
+		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
 		{
+			//复制给content
 			memcpy(content, iter->get_key(), iter->get_length());
-			content += iter->get_length(); //?
+			content += iter->get_length();
 		}
-		bp->SetRecordCount( 1 + bp->GetRecordCount());
-		
+		bp->SetRecordCount(1 + bp->GetRecordCount());
+		//记录插入的块号
 		blocknum = use_block;
-		offset = bp->GetRecordCount()-1;
+		//记录块内偏移量
+		offset = bp->GetRecordCount() - 1;
+		//更新块信息
 		buffer_m_->WriteBlock(bp);
 
-		/* add record to index */
+		//如果有索引
 		if (tb->GetIndexNum() != 0)
 		{
 			BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
@@ -110,64 +123,83 @@ void RecordManager::Insert(SQLInsert& st)
 				}
 			}
 		}
+		//将更新后的结果写回磁盘
 		buffer_m_->WriteToDisk();
+		//将目录信息写回磁盘
 		catalog_m_->WriteArchiveFile();
-		cout << "Insert successfully." << endl;
+		cout << "插入成功！" << endl;
 		return;
 	}
-
+	//如果无可用块但有垃圾块（已经被回收的空块），则插到垃圾块中
 	if (first_rubbish_block != -1)
 	{
+		//拿到第一个垃圾块
 		BlockInfo *bp = GetBlockInfo(tb, first_rubbish_block);
-		content = bp->GetContentAdress(); /* get content */
-		for (auto iter = tkey_values.begin(); iter  != tkey_values.end(); iter ++)
+		content = bp->GetContentAdress();
+		//复制record到content中
+		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
 		{
 			memcpy(content, iter->get_key(), iter->get_length());
-			content += iter->get_length(); //?
+			content += iter->get_length();
 		}
+		//垃圾块的记录为1
 		bp->SetRecordCount(1);
+		//得到跳出while循环之前的block，他的nextBlockNum为-1
 		BlockInfo *last_use_block_p = GetBlockInfo(tb, last_use_block);
+		//把first_rubbish_block挂在他的后面
 		last_use_block_p->SetNextBlockNum(first_rubbish_block);
-
+		//把垃圾块的指针后移一位
 		tb->set_first_rubbish_num(bp->GetNextBlockNum());
+		//该块的前一块为last_use_block
 		bp->SetPrevBlockNum(last_use_block);
+
+		//表明该块的后面无可用块
 		bp->SetNextBlockNum(-1);
-
+		//更新插入块的块号为first_rubbish_block
 		blocknum = first_rubbish_block;
+		//快内偏移量为0，因为它是该块的第一条记录
 		offset = 0;
-
+		//将bp和last_use_block_p设为脏块，等待最后写回磁盘
 		buffer_m_->WriteBlock(bp);
 		buffer_m_->WriteBlock(last_use_block_p);
 	}
-	else
+	else//如果当前既无可用块也无垃圾块供插入，则要创建一个新块
 	{
-		/*initial or add a block*/
 		int next_block = tb->get_first_block_num();
+		//如果不是第一次插入
 		if (next_block != -1)
 		{
 			BlockInfo *up = GetBlockInfo(tb, tb->get_first_block_num());
+			//设置它之前的块的编号为block_count（比自己大1）
 			up->SetPrevBlockNum(tb->get_block_count());
 			buffer_m_->WriteBlock(up);
 		}
+		//设置第一个可用块的编号
 		tb->set_first_block_num(tb->get_block_count());
+		//创建一个新块
 		BlockInfo *bp = GetBlockInfo(tb, tb->get_first_block_num());
-		
+		//它前面无块
 		bp->SetPrevBlockNum(-1);
+		//将next_block挂在他后面，prev_num要比自己的num大
 		bp->SetNextBlockNum(next_block);
+		//将记录加1，把待插记录存到bp块中
 		bp->SetRecordCount(1);
-
 		content = bp->GetContentAdress();
-		for (auto iter = tkey_values.begin(); iter  != tkey_values.end(); iter ++)
+		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
 		{
 			memcpy(content, iter->get_key(), iter->get_length());
-			content += iter->get_length(); 
+			content += iter->get_length();
 		}
+		//更新插入的块号
 		blocknum = tb->get_block_count();
+		//块内偏移量为0
 		offset = 0;
+		//设为脏块
 		buffer_m_->WriteBlock(bp);
+		//将表的块数加1
 		tb->IncreaseBlockCount();
 	}
-	/* add record to index */
+	//如果有index,把记录插到index中
 	if (tb->GetIndexNum() != 0)
 	{
 		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
@@ -180,21 +212,47 @@ void RecordManager::Insert(SQLInsert& st)
 			}
 		}
 	}
+	//将buffer写回磁盘
 	buffer_m_->WriteToDisk();
 	catalog_m_->WriteArchiveFile();
-	cout << "Insert successfully." << endl;
+	cout << "插入成功！" << endl;
 }
 
 void RecordManager::Select(SQLSelect& st)
 {
+	string searchType = "普通查询";
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
+	vector<int> attribute_loc;
+	for (auto i = st.get_select_attribute().begin(); i != st.get_select_attribute().end(); i++)
+	{
+		bool exits = false;
+		int loc = 0;
+		for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++, loc++)
+		{
 
-	vector<vector<TKey> > tuples; //all record satisfy the where condition.
+			if (*i == "*" || attr->get_attr_name() == *i)
+			{
+				attribute_loc.push_back(loc);
+				exits = true;
+				if (*i != "*")
+				{
+					break;
+				}
+			}
+		}
+		if (exits == false)
+		{
+			cout << "查询的字段名在该表中不存在！" << endl;
+			return;
+		}
+	}
+
+	vector<vector<TKey> > tuples;
 	bool has_index = false;
 	int index_idx;
 	int where_idx;
 
-	/* check index */
+	//如果有index,看看index是否作用于查询的属性列上
 	if (tb->GetIndexNum() != 0)
 	{
 		for (auto i = 0; i < tb->GetIndexNum(); i++)
@@ -202,7 +260,7 @@ void RecordManager::Select(SQLSelect& st)
 			Index *idx = tb->GetIndex(i);
 			for (auto j = 0; j < st.GetWheres().size(); j++)
 			{
-				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type !=SIGN_NE)//xj:forB+tree,pre:== SIGN_EQ
+				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type != SIGN_NE)//xj:forB+tree,pre:== SIGN_EQ
 				{
 					has_index = true;
 					index_idx = i;
@@ -211,10 +269,9 @@ void RecordManager::Select(SQLSelect& st)
 			}
 		}
 	}
-
+	//如果查询的列没有index,则遍历所有block
 	if (!has_index)
 	{
-		/* get record from all blocks */
 		int block_num = tb->get_first_block_num();
 		for (int i = 0; i < tb->get_block_count(); i++)
 		{
@@ -222,7 +279,6 @@ void RecordManager::Select(SQLSelect& st)
 			for (int j = 0; j < bp->GetRecordCount(); j++)
 			{
 				vector<TKey> tuple = GetRecord(tb, block_num, j);
-				/* check if satisfy the where condition*/
 				bool sats = true;
 				for (auto k = 0; k < st.GetWheres().size(); k++)
 				{
@@ -234,29 +290,32 @@ void RecordManager::Select(SQLSelect& st)
 			block_num = bp->GetNextBlockNum();
 		}
 	}
-	else /* has index */
+	//如果index作用于该列，则用B+树进行搜索
+	else
 	{
 		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
 
-		/* build tkey for search */
+		//为tkey建索引
 		int type = tb->GetIndex(index_idx)->get_key_type();
 		int length = tb->GetIndex(index_idx)->get_key_len();
 		string value = st.GetWheres()[where_idx].value;
 		TKey dest_key(type, length);
 		dest_key.ReadValue(value);
 
-		//单值查询与范围查询 分支
-		vector<int> blocknumList = tree.GetVal(dest_key, st.GetWheres()[where_idx].op_type);
+		//xujing:单值查询与范围查询 分支
+		vector<int> blocknumList = tree.GetVal(dest_key, st.GetWheres()[where_idx].op_type,searchType);
 		//int blocknum = tree.GetVal(dest_key);
-		//xj:得到查询结果集合
+		//得到查询结果集合
 		for (auto bnum = blocknumList.begin(); bnum != blocknumList.end(); bnum++) {
 			int blocknum = (*bnum);
 			if (blocknum != -1)
 			{
-				/* shift offset */
 				int blockoffset = blocknum;
+				//取高16位，即前2个字节，代表块号
 				blocknum = blocknum >> 16;
+				//取低16位，即后两个字节，代表块内偏移量
 				blocknum = blocknum && 0xffff;
+				//拿到根据块号和块内位移拿到第blockoffset个tuple
 				blockoffset = blockoffset & 0xffff;
 
 				vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
@@ -268,68 +327,75 @@ void RecordManager::Select(SQLSelect& st)
 				}
 				if (sats) tuples.push_back(tuple);
 			}
-		}		
+		}
 	}
 	if (tuples.size() == 0)
 	{
-		cout << "Empty set ";
+		cout << "空表（Empty table）" << endl;
 		return;
 	}
-	/* print attributes name */
+	//打印属性名
 	string sline = "";
-	for (int i = 0; i < tb->GetAttributes().size(); i++)
+	for (int i = 0; i < attribute_loc.size(); i++)
 	{
-		cout <<"+----------";
+		cout << "+----------";
 		sline += "+----------";
 	}
-	cout <<"+"<<endl;
+	cout << "+" << endl;
 	sline += "+";
 
-	for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++)
+	for (int i = 0; i<attribute_loc.size(); i++)
 	{
-		cout << "| "<< setw(9) << left << attr->get_attr_name();
+		cout << "| " << setw(9) << left << tb->GetAttributes()[attribute_loc[i]].get_attr_name();
 	}
 	cout << "|" << endl;
 	cout << sline << endl;
 
-	//xj:聚集函数使用
+	//xujing:聚集函数使用
 	int index = 2;//1:第2列属性
-	//TKey min = Min(tuples, index);//testMin
-	//TKey min = Max(tuples, index);//testMax
-	//TKey* min = Avg(tuples, index);//testAvg:varchar时返回key_=“”
+				  //TKey min = Min(tuples, index);//testMin
+				  //TKey min = Max(tuples, index);//testMax
+				  //TKey* min = Avg(tuples, index);//testAvg:varchar时返回key_=“”
 	int min = Count(tuples, index);//testCount
-	//
+								   //
 
-/* show select result */
+								   //打印结果
 	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++)
 	{
-		for (auto val = tuple->begin(); val != tuple->end(); val++)
+		for (int i = 0; i < attribute_loc.size(); i++)
 		{
-			cout << "| "<< setw(10) << (*val);
+			auto val = tuple->begin() + attribute_loc[i];
+			cout << "| " << setw(10) << (*val);
 		}
+
+		//for (auto val = tuple->begin(); val != tuple->end(); val++)
+		//{
+		//	cout << "| "<< setw(10) << (*val);
+		//}
+
 		cout << "|" << endl;
 		cout << sline << endl;
 	}
 
-	//xj:聚集函数测试输出
+	//xujing:聚集函数测试输出
 	cout << "| Result | " << setw(10) << min;//(*min);
 
-	/* Print index tree. */
-	if (tb->GetIndexNum() != 0)
+	cout << "| 查询方式 | " << setw(10) << searchType << endl;
+	//索引打印测试
+	/*if (tb->GetIndexNum() != 0)
 	{
 		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
 		tree.Print();
-	}
+	}*/
 }
-
 void RecordManager::Delete(SQLDelete& st)
 {
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
 	bool has_index = false;
 	int index_idx;
 	int where_idx;
-	
-	/* check index */
+
+	//看是否有index
 	if (tb->GetIndexNum() != 0)
 	{
 		for (auto i = 0; i < tb->GetIndexNum(); i++)
@@ -346,17 +412,17 @@ void RecordManager::Delete(SQLDelete& st)
 			}
 		}
 	}
+	//如果index不是作用于删除列，则遍历块
 	if (!has_index)
 	{
-		/* get record from all blocks */
 		int block_num = tb->get_first_block_num();
 		for (int i = 0; i < tb->get_block_count(); i++)
 		{
 			BlockInfo *bp = GetBlockInfo(tb, block_num);
-			for (int j = 0; j < bp->GetRecordCount(); j++)
+			int count_ = bp->GetRecordCount();
+			for (int j = 0; j < count_; j++)
 			{
 				vector<TKey> tuple = GetRecord(tb, block_num, j);
-				/* check if satisfy the where condition*/
 				bool sats = true;
 				for (int k = 0; k < st.GetWheres().size(); k++)
 				{
@@ -365,6 +431,7 @@ void RecordManager::Delete(SQLDelete& st)
 				}
 				if (sats)
 				{
+					//删除该记录
 					DeleteRecord(tb, block_num, j);
 					if (tb->GetIndexNum() != 0)
 					{
@@ -382,11 +449,12 @@ void RecordManager::Delete(SQLDelete& st)
 			block_num = bp->GetNextBlockNum();
 		}
 	}
+	//如果index是作用于删除列
 	else
 	{
 		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
 
-		/* build tkey for search */
+		//为search创建tkey
 		int type = tb->GetIndex(index_idx)->get_key_type();
 		int length = tb->GetIndex(index_idx)->get_key_len();
 		string value = st.GetWheres()[where_idx].value;
@@ -397,7 +465,6 @@ void RecordManager::Delete(SQLDelete& st)
 
 		if (blocknum != -1)
 		{
-			/* shift offset */
 			int blockoffset = blocknum;
 			blocknum = blocknum >> 16;
 			blocknum = blocknum && 0xffff;
@@ -412,32 +479,32 @@ void RecordManager::Delete(SQLDelete& st)
 			}
 			if (sats)
 			{
+				//将该记录删除
 				DeleteRecord(tb, blocknum, blockoffset);
 				tree.Remove(dest_key);
 			}
 		}
 	}
 	buffer_m_->WriteToDisk();
-	cout << "Delete successfully." << endl; 
+	cout << "删除成功！" << endl;
 }
 
 void RecordManager::Update(SQLUpdate& st)
 {
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
 
-	vector<int> indices; //all index
+	vector<int> indices;
 	vector<TKey> tuple;
 	int primary_key_index = -1;
 	int affect_index = -1;
 
-	/* find primarykey */
-	for(int i = 0; i < tb->GetAttributes().size(); ++i)
+	//找主键
+	for (int i = 0; i < tb->GetAttributes().size(); ++i)
 	{
 		if (tb->GetAttributes()[i].get_attr_type() == 1)
 			primary_key_index = i;
 	}
 
-	/* find the record index to update */
 	for (int i = 0; i < st.GetKeyValues().size(); i++)
 	{
 		int index = tb->GetAttributeIndex(st.GetKeyValues()[i].key);
@@ -445,10 +512,9 @@ void RecordManager::Update(SQLUpdate& st)
 		TKey value(tb->GetAttributes()[index].get_data_type(), tb->GetAttributes()[index].get_length());
 		value.ReadValue(st.GetKeyValues()[i].value);
 		tuple.push_back(value);
-		
+
 		if (index == primary_key_index) affect_index = i;
 	}
-
 	if (affect_index != -1)
 	{
 		if (tb->GetIndexNum() != 0)
@@ -474,14 +540,14 @@ void RecordManager::Update(SQLUpdate& st)
 			}
 		}
 	}
-	int block_num = tb->get_first_block_num(); 
+	int block_num = tb->get_first_block_num();
 	for (int i = 0; i < tb->get_block_count(); i++)
 	{
 		BlockInfo *bp = GetBlockInfo(tb, block_num);
 
 		for (int j = 0; j < bp->GetRecordCount(); j++)
 		{
-			vector<TKey> tp = GetRecord(tb, block_num,j);
+			vector<TKey> tp = GetRecord(tb, block_num, j);
 			bool sats = true;
 			for (int k = 0; k < st.GetWheres().size(); k++)
 			{
@@ -503,7 +569,7 @@ void RecordManager::Update(SQLUpdate& st)
 					tree.Remove(tuple[idx]);
 				}
 				UpdateRecord(tb, block_num, j, indices, tuple);
-				
+
 				tp = GetRecord(tb, block_num, j);
 				/* add index for new key. */
 				if (tb->GetIndexNum() != 0)
@@ -522,72 +588,79 @@ void RecordManager::Update(SQLUpdate& st)
 		block_num = bp->GetNextBlockNum();
 	}
 	buffer_m_->WriteToDisk();
-	cout << "Update successfully." << endl;
+	cout << "更新成功！" << endl;
 }
-
+//根据表的块号拿到块信息
 BlockInfo* RecordManager::GetBlockInfo(Table* tbl, int block_num)
 {
 	if (block_num == -1) return NULL;
 	BlockInfo* block = buffer_m_->GetFileBlock(db_name_, tbl->get_tb_name(), 0, block_num);
 	return block;
 }
-
+//返回tb1的第block_num块里的第offset个tuple
 vector<TKey> RecordManager::GetRecord(Table* tbl, int block_num, int offset)
 {
 	vector<TKey> keys;
 	BlockInfo *bp = GetBlockInfo(tbl, block_num);
-	char *content = bp->get_data() + offset * tbl->get_record_length() + 12;			/*bp->get_data()获取指向该数据的首指针，偏移表头及offset个记录长度，最终指针指向第offset个记录的头部*/
-	
-	for(int i = 0; i < tbl->GetAttributeNum(); ++i)
+	char *content = bp->get_data() + 12 + offset * tbl->get_record_length();
+
+	for (int i = 0; i < tbl->GetAttributeNum(); ++i)
 	{
 		int value_type = tbl->GetAttributes()[i].get_data_type();
 		int length = tbl->GetAttributes()[i].get_length();
-		
+		//一个属性值，数据类型和属性长度
 		TKey tmp(value_type, length);
-
+		//将content指针后的length个字节复制给tmp的key
 		memcpy(tmp.get_key(), content, length);
+		//cout << "RecordManager::GetRecord::memcpy :" << content << " to " << tmp.get_key() << endl;
 		keys.push_back(tmp);
 		content += length;
 	}
 	return keys;
 }
-
+//删除tb1的block_num块的第offset个tuple
 void RecordManager::DeleteRecord(Table* tbl, int block_num, int offset)
 {
 	BlockInfo *bp = GetBlockInfo(tbl, block_num);
 	char *content = bp->get_data() + offset * tbl->get_record_length() + 12;
-	char *replace = bp->get_data() + (bp->GetRecordCount() - 1) * tbl->get_record_length() + 12;
+	char *replace = bp->get_data() + (bp->GetRecordCount() - 1) * (tbl->get_record_length()) + 12;
+	//把待删记录复制到该块的尾部
 	memcpy(content, replace, tbl->get_record_length());
-
+	//记录数量减一
 	bp->DecreaseRecordCount();
-
-	if (bp->GetRecordCount() == 0) /* add the block to rubbish block chain */
+	//如果删除后，该块记录为0，则把它加到垃圾块的链表里
+	if (bp->GetRecordCount() == 0)
 	{
 		int prevnum = bp->GetPrevBlockNum();
 		int nextnum = bp->GetNextBlockNum();
-		if (prevnum != -1) 
-		{
+		if (prevnum != -1)
+		{//则将前一块的next置为当前块的next
 			BlockInfo *pbp = GetBlockInfo(tbl, prevnum);
 			pbp->SetNextBlockNum(nextnum);
 			buffer_m_->WriteBlock(pbp);
 		}
-		if (nextnum != -1) 
-		{
+		if (nextnum != -1)
+		{//则将下一块的previous置为当前块的previous
 			BlockInfo *nbp = GetBlockInfo(tbl, nextnum);
-			nbp->SetNextBlockNum(prevnum);
+			nbp->SetPrevBlockNum(prevnum);
+			//将bp置为dirty，被修改过
 			buffer_m_->WriteBlock(nbp);
 		}
+		//拿到表中可用块的第一个指针
+		BlockInfo *firstrubbish = GetBlockInfo(tbl, tbl->get_first_block_num());
 
-		BlockInfo *firstrubbish = GetBlockInfo(tbl,tbl->get_first_block_num());
 		bp->SetNextBlockNum(-1);
 		bp->SetPrevBlockNum(-1);
 		if (firstrubbish != NULL)
 		{
+			//将这个垃圾块放到firstrubbish之前，也就是把这个空出来的块挂在可用块的队首的前面
 			firstrubbish->SetPrevBlockNum(block_num);
 			bp->SetNextBlockNum(firstrubbish->get_block_num());
 		}
+		//把这个新的垃圾块置为垃圾块队首
 		tbl->set_first_rubbish_num(block_num);
 	}
+	//将bp置为dirty，被修改过
 	buffer_m_->WriteBlock(bp);
 }
 
@@ -595,7 +668,7 @@ void RecordManager::UpdateRecord(Table* tbl, int block_num, int offset, vector<i
 {
 	BlockInfo *bp = GetBlockInfo(tbl, block_num);
 	char *content = bp->get_data() + offset * tbl->get_record_length() + 12;
-	
+
 	for (int i = 0; i < tbl->GetAttributeNum(); i++)
 	{
 		auto iter = find(indices.begin(), indices.end(), i);
@@ -617,7 +690,7 @@ bool RecordManager::SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where)
 
 	TKey tmp(tbl->GetAttributes()[idx].get_data_type(), tbl->GetAttributes()[idx].get_length());
 	tmp.ReadValue(where.value.c_str());
-	
+
 	switch (where.op_type)
 	{
 	case SIGN_EQ:
@@ -649,7 +722,7 @@ bool RecordManager::SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where)
 TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex) {
 	TKey * temp = nullptr;//返回值
 	int j = 0;
-	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++,j++)
+	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++, j++)
 	{
 		int i = 0;
 		for (auto val = tuple->begin(); val != tuple->end(); val++, i++)
@@ -663,7 +736,7 @@ TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex) {
 				if ((*temp) > (*val))
 					(*temp) = (*val);
 			}
-		}		
+		}
 	}
 	return (*temp);
 }
@@ -714,7 +787,7 @@ TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex) {
 			}
 		}
 	}
-	if(temp!=nullptr)
+	if (temp != nullptr)
 		(*temp) /= j;
 	return (temp);
 }

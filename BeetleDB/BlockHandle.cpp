@@ -1,44 +1,47 @@
+//Implemented by Lai ZhengMin
 #include "BlockHandle.h"
 
-
+//管理某个表的所有块
 BlockHandle::BlockHandle(string path)
 {
 	first_block_ = new BlockInfo(0);
-	block_size_ = 300; //
-	block_count_ = 0;
+	block_size_ = 300; //一个表最大可装300块，即1200KB
+	block_count_ = 0; //已创建的可用的块数
 	path_ = path;
 	Add(first_block_);
 }
 
-BlockHandle::~BlockHandle(void)
+BlockHandle::~BlockHandle()
 {
 	BlockInfo* b = first_block_;
+	//释放所有块
 	while (block_count_ > 0)
 	{
 		BlockInfo* bn = b->GetNext();
 		delete b;
 		b = bn;
-		block_count_ --;
+		block_count_--;
 	}
 }
-
+//拿到可用的块的数目
 int BlockHandle::get_block_count() { return block_count_; }
 
-/* return first_block ->next(); */
+/* 返回first_block ->GetNext(); 第一块是空块指针*/
 BlockInfo* BlockHandle::GetUsableBlock()
 {
-	if (block_count_ == 0) return NULL;  //?block_count means valuable block or dirty block?
-	
+	if (block_count_ == 0) return NULL;
+
 	BlockInfo* p = first_block_->GetNext();
 	first_block_->SetNext(first_block_->GetNext()->GetNext());
-	block_count_ --;
+	block_count_--;
 
 	p->ResetAge();
 	p->SetNext(NULL);
 	return p;
 }
 
-void BlockHandle::FreeBlock(BlockInfo* block)
+//在first_block后插入一个block
+void BlockHandle::AddANewBlockBehindFirstBlock(BlockInfo* block)
 {
 	if (block_count_ == 0)
 	{
@@ -50,15 +53,16 @@ void BlockHandle::FreeBlock(BlockInfo* block)
 		block->SetNext(first_block_->GetNext());
 		first_block_->SetNext(block);
 	}
-	block_count_ ++;
+	block_count_++;
 }
-
-BlockInfo* BlockHandle::Add(BlockInfo* block) 
+//递归地开辟300块
+BlockInfo* BlockHandle::Add(BlockInfo* block)
 {
+	//开辟新块，编号都为0
 	BlockInfo* adder = new BlockInfo(0);
 	adder->SetNext(block->GetNext());
 	block->SetNext(adder);
 	block_count_++;
 	if (block_count_ == block_size_) return adder;
-    else return Add(adder);
+	else return Add(adder);
 }

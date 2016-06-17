@@ -1,15 +1,10 @@
-//
-// CatalogManager.h
-//
-//
 #pragma once
 #ifndef _CATALOGMANAGER_H_
 #define _CATALOGMANAGER_H_
 
-#include "SQLStatement.h"
 #include <vector>
 #include <string>
-
+#include "SQLStatement.h"
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/serialization/utility.hpp>
@@ -28,175 +23,165 @@ class SQLDropIndex;
 class CatalogManager
 {
 public:
-	CatalogManager(string path);
-	~CatalogManager(void);
-	string get_path();
-	vector<Database>& GetDBs();
-	Database* GetDB(string db_name);
-	void ReadArchiveFile();
-	void WriteArchiveFile();
-	void CreateDatabase(string dbname);
-	void DeleteDatabase(string dbname);
+	CatalogManager(string path);/*CatalogManager构造函数*/
+	~CatalogManager(void);/*CatalogManager析构函数*/
+	string get_path();/*获取变量path_*/
+	vector<Database>& GetDBs();/*获取变量,get_databases() dbs_*/
+	Database* GetDB(string database_name);/*根据database名获取对应Database类*/
+	void ReadArchiveFile();/*读取目录文档*/
+	void WriteArchiveFile();/*写入目录文档*/
+	void CreateDatabase(string database_name);/*目录中根据database名创键一个database*/
+	void DeleteDatabase(string database_name);/*目录中根据database名删除一个database*/
 private:
-	friend class boost::serialization::access;
-	template<class Archive>
+	friend class boost::serialization::access;/*友元函数。为了能让串行化类库能够访问私有成员，所以要声明一个友元类*/
+	template<class Archive>/*串行化的函数，这一个函数完成对象的保存与恢复*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
-		ar & dbs_;
+		ar & databases_;
 	}
-	string path_;
-	vector<Database> dbs_;
+	string path_;//存储database文件的路径变量
+	vector<Database> databases_;//存储数据库类的变量
 };
 
 class Database {
 public:
-	Database();
-	Database(string dbname);
-	~Database();
-	string get_db_name();
-	vector<Table>& GetTables();
-	Table* GetTable(string tb_name);
-	void CreateTable(SQLCreateTable& st);
-	void DropTable(SQLDropTable& st);
-	void DropIndex(SQLDropIndex& st);
-	bool CheckIfIndexExists(string index_name);
+	Database();/*Database不带参数构造函数*/
+	Database(string database_name);/*Database带参数构造函数*/
+	~Database();/*Database析构函数*/
+	string get_database_name();/*获取变量database_name_*/
+	vector<Table>& get_tables();/*获取变量tables_*/
+	Table* GetTable(string table_name);/*根据table名获取对应的Table类*/
+	void CreateTable(SQLCreateTable& obj);/*根据SQLCreateTable对象创建一个table*/
+	void DropTable(SQLDropTable& obj);/*根据SQLDropTable对象删除一张table*/
+	void DropIndex(SQLDropIndex& obj);/*根据SQLDropIndex对象创建一个index*/
+	bool CheckIfIndexExists(string index_name);/*根据索引名判断该索引是否存在*/
 private:
-	friend class boost::serialization::access;
-	template<class Archive>
+	friend class boost::serialization::access;/*友元函数。为了能让串行化类库能够访问私有成员，所以要声明一个友元类*/
+	template<class Archive>/*串行化的函数，这一个函数完成对象的保存与恢复*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
-		ar & db_name_;
-		ar & tbs_;
+		ar & database_name_;
+		ar & tables_;
 	}
-	string db_name_;
-	vector<Table> tbs_;
+	string database_name_;//存储数据库名字的变量
+	vector<Table> tables_;//存储Table类的变量
 };
 
 class Table {
 public:
-	Table();
-	~Table();
-	string get_tb_name();
-	void set_tb_name(string tbname);
-	int get_record_length();
-	void set_record_length(int len);
-	
-	vector<Attribute>& GetAttributes();
-	Attribute* GetAttribute(string name);
-	int GetAttributeIndex(string name);
+	Table();/*Table的构造函数*/
+	~Table();/*Table的析构函数*/
+	string get_tb_name();/*获取变量table_name_*/
+	void set_table_name(string table_name);/*设置变量table_name_*/
+	int get_record_length();/*获取变量record_length_*/
+	void set_record_length(int len);/*设置变量record_length_*/
 
-	int get_first_block_num();
-	void set_first_block_num(int num);
-	int get_first_rubbish_num();
-	void set_first_rubbish_num(int num);
-	int get_block_count();
+	vector<Attribute>& GetAttributes();/*获取变量attributes*/
+	Attribute* GetAttribute(string name);/*根据字段名获取attribute对象*/
+	int GetAttributeIndex(string name);/*根据字段名获取attribute对象的位置*/
 
-	unsigned long GetAttributeNum();
-	void AddAttribute(Attribute& attr);
-	void IncreaseBlockCount();
-	
-	std::vector<Index>& get_ids();
-	Index* GetIndex(int num);
-	unsigned long GetIndexNum();
-	void AddIndex(Index& idx);
+	int get_first_block_num();/*获取变量first_block_num*/
+	void set_first_block_num(int num);/*设置变量first_block_num*/
+	int get_first_rubbish_num();/*获取变量first_rubbish_num_*/
+	void set_first_rubbish_num(int num);/*设置变量first_rubbish_num_*/
+	int get_block_count();/*获取变量block_count_*/
+
+	unsigned long GetAttributeNum();/*获取字段数量*/
+	void AddAttribute(Attribute& attr);/*传入Attribute对象，将该对象插入Table对象中*/
+	void IncreaseBlockCount();/*block_count++*/
+
+	std::vector<Index>& get_indexs();/*获取变量indexs*/
+	Index* GetIndex(int num);/*根据index位置获取对应的Index对象*/
+	unsigned long GetIndexNum();/*获取Index数量*/
+	void AddIndex(Index& idx);/*传入Index对象，将该对象插入该Table对象中*/
 private:
-    friend class boost::serialization::access;
-    
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & tb_name_;
-        ar & record_length_;
-        ar & first_block_num_;
-        ar & first_rubbish_num_;
-        ar & block_count_;
-        ar & ats_;
-        ar & ids_;
-    } 
-    string tb_name_;
-    int record_length_;
-    int first_block_num_;
-    int first_rubbish_num_;
-    int block_count_;
-    
-    std::vector<Attribute> ats_;
-    std::vector<Index> ids_;
+	friend class boost::serialization::access;/*友元函数。为了能让串行化类库能够访问私有成员，所以要声明一个友元类*/
+	template<class Archive>/*串行化的函数，这一个函数完成对象的保存与恢复*/
+	void serialize(Archive & ar, const unsigned int version)
+	{
+		ar & table_name_;
+		ar & record_length_;
+		ar & first_block_num_;
+		ar & first_rubbish_num_;
+		ar & block_count_;
+		ar & attributes_;
+		ar & indexs_;
+	}
+	string table_name_;//存储数据表名字的变量
+	int record_length_;//存储记录总长度的变量
+	int first_block_num_;//存储第一个块的地址的变量
+	int first_rubbish_num_;
+	int block_count_;//存储块的数量的变量
+
+	std::vector<Attribute> attributes_;//存储字段的变量
+	std::vector<Index> indexs_;//存储索引的变量
 };
 
 class Attribute
 {
 public:
-	Attribute();
-	~Attribute();
-	
-	string get_attr_name();
-	void set_attr_name(string name);
-	
-	int get_attr_type();
-	void set_attr_type(int type);
-
-	int get_data_type();
-	void set_data_type(int type);
-
-	int get_length();
-	void set_length(int length);
-
+	Attribute();/*Attribute构造函数*/
+	~Attribute();/*Attribute析构函数*/
+	string get_attr_name();/*获取变量attribute_name_*/
+	void set_attribute_name(string name);/*设置变量attribute_name_*/
+	int get_attr_type();/*获取变量attribute_type_*/
+	void set_attribute_type(int type);/*设置attribute_type_*/
+	int get_data_type();/*获取变量data_type_*/
+	void set_data_type(int type);/*设置变量data_type_*/
+	int get_length();/*获取变量length_*/
+	void set_length(int length);/*设置变量length_*/
 private:
-	friend class boost::serialization::access;
-
-	template<class Archive>
+	friend class boost::serialization::access;/*友元函数。为了能让串行化类库能够访问私有成员，所以要声明一个友元类*/
+	template<class Archive>/*串行化的函数，这一个函数完成对象的保存与恢复*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
-		ar & attr_name_;
+		ar & attribute_name_;
 		ar & data_type_;
 		ar & length_;
-		ar & attr_type_;
+		ar & attribute_type_;
 	}
-
-	string attr_name_;
-	int data_type_;
-	int length_;
-	int attr_type_;
+	string attribute_name_;//存储字段名的变量
+	int attribute_type_;//存储字段类型的变量
+	int data_type_;//存储数据类型的变量
+	int length_;//存储该字段长度的长度
 };
 
 class Index {
 public:
-	Index();
-    Index(std::string name, std::string attr_name, int keytype, int keylen,int rank);
-    
-    // accessors and mutators
-	string get_attr_name();
-	string get_name();
-	int get_key_len();
-	int get_key_type();
-	int get_rank();
-	int get_root();
-	void set_root(int root);
-	int get_leaf_head();
-	void set_leaf_head(int leaf_head);
-	int get_key_count();
-	void set_key_count(int key_count);
-	int get_level();
-	void set_level(int level);
-	int get_node_count();
-	void set_node_count(int node_count);
-	
-	int IncreaseMaxCount();
-	int IncreaseKeyCount();
-	int IncreaseNodeCount();
-	int IncreaseLevel();
-	int DecreaseKeyCount();
-	int DecreaseNodeCount();
-	int DecreaseLevel();
+	Index();/*Index构造函数*/
+	Index(std::string name, std::string attr_name, int keytype, int keylen, int rank);/*Index带参数构造函数*/
+	string get_attr_name();/*获取变量attribute_name_*/
+	string get_name();/*获取变量name_*/
+	int get_key_len();/*获取变量key_length_*/
+	int get_key_type();/*获取变量key_type_*/
+	int get_rank();/*获取变量rank_*/
+	int get_root();/*获取变量root_*/
+	void set_root(int root);/*设置变量root_*/
+	int get_leaf_head();/*获取变量leaf_head_*/
+	void set_leaf_head(int leaf_head);/*设置变量leaf_head_*/
+	int get_key_count();/*获取变量key_count_*/
+	void set_key_count(int key_count);/*设置变量key_count_*/
+	int get_level();/*获取变量level_*/
+	void set_level(int level);/*设置变量level_*/
+	int get_node_count();/*获取变量node_count_*/
+	void set_node_count(int node_count);/*设置变量node_count_*/
+
+	int IncreaseMaxCount();/*max_count_++*/
+	int IncreaseKeyCount();/*key_count_++*/
+	int IncreaseNodeCount();/*node_count_++*/
+	int IncreaseLevel();/*level_++*/
+	int DecreaseKeyCount();/*key_count--*/
+	int DecreaseNodeCount();/*node_count--*/
+	int DecreaseLevel();/*level--*/
 private:
-	friend class boost::serialization::access;
-	template<class Archive>
+	friend class boost::serialization::access;/*友元函数。为了能让串行化类库能够访问私有成员，所以要声明一个友元类*/
+	template<class Archive>/*串行化的函数，这一个函数完成对象的保存与恢复*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & max_count_;
-		ar & attr_name_;
+		ar & attribute_name_;
 		ar & name_;
-		ar & key_len_;
+		ar & key_length_;
 		ar & key_type_;
 		ar & rank_;
 		ar & rubbish_;
@@ -206,18 +191,18 @@ private:
 		ar & level_;
 		ar & node_count_;
 	}
-	int max_count_;
-	int key_len_;
-	int key_type_;
+	int max_count_;//存储数据最大值的变量
+	int key_length_;//存储主键长度的变量
+	int key_type_;//存储主键类型的变量
 	int rank_;
 	int rubbish_;
 	int root_;
-	int leaf_head_;			/*叶子节点的头部*/
+	int leaf_head_;/*叶子节点的头部*/
 	int key_count_;
 	int level_;
 	int node_count_;
-	string attr_name_;
-	string name_;
+	string attribute_name_;//存储字段名的变量
+	string name_;//存储索引名的变量
 };
 
 #endif

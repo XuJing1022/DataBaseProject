@@ -7,7 +7,7 @@
 #include<iostream>
 #include "BPlusTree.h"
 #include "Exceptions.h"
-#include "StaticValue.h"
+#include "ConstValue.h"
 using namespace std;
 /* ------------------------- BPlusTree ------------------------------- */
 
@@ -409,96 +409,116 @@ int BPlusTree::GetVal(TKey key)
 }
 
 //range&single search
-vector<int> BPlusTree::GetVal(TKey key,int op_type)
+vector<int> BPlusTree::GetVal(TKey key,int op_type,string & searchType)
 {
 	vector<int> ans ;
 	if (idx_->get_root() != -1) {	/*索引不为空时。处理空表建索引后插值异常问题*/
 		FindNodeParam fnp = Search(idx_->get_root(), key);
-		if (fnp.flag) {			
-			BPlusTreeNode * temp=new BPlusTreeNode(*fnp.pnode);
-			BPlusTreeNode * firstNode = new BPlusTreeNode(*GetNode(idx_->get_leaf_head()));//获取叶子头部节点信息
-			int index = fnp.index;
-			switch ( op_type)
-			{
-			case SIGN_EQ:
+		
+		BPlusTreeNode * temp=new BPlusTreeNode(*fnp.pnode);
+		BPlusTreeNode * firstNode = new BPlusTreeNode(*GetNode(idx_->get_leaf_head()));//获取叶子头部节点信息
+		int index = fnp.index;
+		switch ( op_type)
+		{
+		case SIGN_EQ:
+			if (fnp.flag) {
 				ans.push_back(fnp.pnode->GetValues(fnp.index));
-				break;
-			case SIGN_GT://>				
-				//读本节点的有效记录				
-				while (++index < (*temp).GetCount()) {
-					ans.push_back(temp->GetValues(index));
-				}
-				//读后续节点的有效记录
-				while ((*temp).GetNextLeaf() != -1) {
-					temp = GetNode((*temp).GetNextLeaf());
-					index = 0;
-					while (index < (*temp).GetCount()) {
-						ans.push_back(temp->GetValues(index));
-						index++;
-					}
-				}
-				break;
-			case SIGN_LT://<				
-				//读前节点到当前节点的当前位置的所有有效记录
-				
-				while ((*firstNode).get_block_num() != (*temp).GetNextLeaf()) {
-					int idx = 0;
-					bool flag = true;
-					while (idx < (*firstNode).GetCount()) {
-						if ((*firstNode).get_block_num() == (*temp).get_block_num() && idx == index)//读到当前块的当前KV对时，停止
-						{
-							flag = false;
-							break;
-						}
-						ans.push_back(firstNode->GetValues(idx));
-						idx++;
-					}
-					if (!flag)
-						break;
-					firstNode = GetNode((*firstNode).GetNextLeaf());//下一个相邻叶子节点
-				}
-				break;
-			case SIGN_GE://>=
-				ans.push_back(fnp.pnode->GetValues(fnp.index));//=
-				//读本节点的有效记录				
-				while (++index < (*temp).GetCount()) {
-					ans.push_back(temp->GetValues(index));
-				}
-				//读后续节点的有效记录
-				while ((*temp).GetNextLeaf() != -1) {
-					temp = GetNode((*temp).GetNextLeaf());
-					index = 0;
-					while (index < (*temp).GetCount()) {
-						ans.push_back(temp->GetValues(index));
-						index++;
-					}
-				}
-				break;
-			case SIGN_LE://<=
-						 //读前节点到当前节点的当前位置的所有有效记录
-				
-				while ((*firstNode).get_block_num() != (*temp).GetNextLeaf()) {
-					int idx = 0;
-					bool flag = true;
-					while (idx < (*firstNode).GetCount()) {
-						if ((*firstNode).get_block_num() == (*temp).get_block_num() && idx == index)
-						{
-							ans.push_back(fnp.pnode->GetValues(fnp.index));//=
-							flag = false;
-							break;
-						}
-						ans.push_back(firstNode->GetValues(idx));
-						idx++;
-					}
-					if (!flag)
-						break;
-					firstNode = GetNode((*firstNode).GetNextLeaf());//下一个相邻叶子节点
-				}
-				break;
-			default:
+			}
+			break;
+		case SIGN_GT://>	
+			if (!fnp.flag&&fnp.pnode->GetKeys(fnp.pnode->GetCount() - 1)<=key) {//防止这种情况被忽略：id(1)>0。所以该节点的最右值也<=key时，该节点才无效。
 				break;
 			}
+			searchType = "基于B+树的范围查询";
+			//读本节点的有效记录				
+			while (index < (*temp).GetCount()) {
+				ans.push_back(temp->GetValues(index));
+				index++;
+			}
+			//读后续节点的有效记录
+			while ((*temp).GetNextLeaf() != -1) {
+				temp = GetNode((*temp).GetNextLeaf());
+				index = 0;
+				while (index < (*temp).GetCount()) {
+					ans.push_back(temp->GetValues(index));
+					index++;
+				}
+			}
+			break;
+		case SIGN_LT://<	
+			if (!fnp.flag&&fnp.pnode->GetKeys(0) >= key) {
+				break;
+			}
+			searchType = "基于B+树的范围查询";
+			//读前节点到当前节点的当前位置的所有有效记录
+				
+			while ((*firstNode).get_block_num() != (*temp).GetNextLeaf()) {
+				int idx = 0;
+				bool flag = true;
+				while (idx < (*firstNode).GetCount()) {
+					if ((*firstNode).get_block_num() == (*temp).get_block_num() && idx == index)//读到当前块的当前KV对时，停止
+					{
+						flag = false;
+						break;
+					}
+					ans.push_back(firstNode->GetValues(idx));
+					idx++;
+				}
+				if (!flag)
+					break;
+				firstNode = GetNode((*firstNode).GetNextLeaf());//下一个相邻叶子节点
+			}
+			break;
+		case SIGN_GE://>=
+			if (!fnp.flag&&fnp.pnode->GetKeys(fnp.pnode->GetCount() - 1) < key) {
+				break;
+			}
+			searchType = "基于B+树的范围查询";
+			ans.push_back(fnp.pnode->GetValues(fnp.index));//=
+			//读本节点的有效记录				
+			while (index < (*temp).GetCount()) {
+				ans.push_back(temp->GetValues(index));
+				index++;
+			}
+			//读后续节点的有效记录
+			while ((*temp).GetNextLeaf() != -1) {
+				temp = GetNode((*temp).GetNextLeaf());
+				index = 0;
+				while (index < (*temp).GetCount()) {
+					ans.push_back(temp->GetValues(index));
+					index++;
+				}
+			}
+			break;
+		case SIGN_LE://<=
+			if (!fnp.flag&&fnp.pnode->GetKeys(0) > key) {
+				break;
+			}
+			searchType = "基于B+树的范围查询";
+						//读前节点到当前节点的当前位置的所有有效记录
+				
+			while ((*firstNode).get_block_num() != (*temp).GetNextLeaf()) {
+				int idx = 0;
+				bool flag = true;
+				while (idx < (*firstNode).GetCount()) {
+					if ((*firstNode).get_block_num() == (*temp).get_block_num() && idx == index)
+					{
+						ans.push_back(fnp.pnode->GetValues(fnp.index));//=
+						flag = false;
+						break;
+					}
+					ans.push_back(firstNode->GetValues(idx));
+					idx++;
+				}
+				if (!flag)
+					break;
+				firstNode = GetNode((*firstNode).GetNextLeaf());//下一个相邻叶子节点
+			}
+			break;
+		default:
+			break;
 		}
+		
 			
 	}
 	return ans;

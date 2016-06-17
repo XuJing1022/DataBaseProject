@@ -1,49 +1,50 @@
-﻿  SQLStatement.cpp
-d:\用户目录\documents\github\databaseproject\beetledb\sqlstatement.cpp(505): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-d:\用户目录\documents\github\databaseproject\beetledb\sqlstatement.cpp(527): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'd:\用户目录\documents\github\databaseproject\debug\beetledb.pdb' because it is being used by another process.
+  SQLStatement.cpp
+d:\用户目录\documents\github\databaseproject\beetledb\sqlstatement.cpp(774): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
+d:\用户目录\documents\github\databaseproject\beetledb\sqlstatement.cpp(796): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
   RecordManager.cpp
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(32): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(104): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(174): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(200): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(203): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(227): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(264): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(280): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(335): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(338): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(361): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(373): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(408): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(434): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(441): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(486): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(498): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(513): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(541): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(599): warning C4018: “<”: 有符号/无符号不匹配
-d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(612): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(117): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(206): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(258): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(261): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(283): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(323): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(339): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(347): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(365): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(401): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(404): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(427): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(440): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(475): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(502): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(508): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(552): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(564): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(579): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(607): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(672): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\recordmanager.cpp(685): warning C4018: “<”: 有符号/无符号不匹配
   main.cpp
-  Interpreter.cpp
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(240): warning C4244: “参数”: 从“std::streamoff”转换到“unsigned int”，可能丢失数据
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(277): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(278): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(279): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(280): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(281): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(282): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(283): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(284): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(285): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(286): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(287): warning C4101: “e”: 未引用的局部变量
-d:\用户目录\documents\github\databaseproject\beetledb\interpreter.cpp(288): warning C4101: “e”: 未引用的局部变量
+  QueryParser.cpp
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(364): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(365): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(366): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(367): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(368): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(369): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(370): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(371): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(372): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(373): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(374): warning C4101: “e”: 未引用的局部变量
+d:\用户目录\documents\github\databaseproject\beetledb\queryparser.cpp(375): warning C4101: “e”: 未引用的局部变量
   IndexManager.cpp
   FileInfo.cpp
   FileHandle.cpp
   Exceptions.cpp
   CatalogManager.cpp
-d:\用户目录\documents\github\databaseproject\beetledb\catalogmanager.cpp(63): warning C4018: “<”: 有符号/无符号不匹配
+d:\用户目录\documents\github\databaseproject\beetledb\catalogmanager.cpp(77): warning C4018: “<”: 有符号/无符号不匹配
   BufferManager.cpp
   BPlusTree.cpp
   BlockInfo.cpp
