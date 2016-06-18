@@ -1,7 +1,7 @@
 #pragma region
-//¼ò½é£º²éÑ¯½âÎöÆ÷
+//ç®€ä»‹ï¼šæŸ¥è¯¢è§£æå™¨
 //Implemented by Jin Xin
-//×÷ÓÃ£º¸ºÔğ½âÎöÓÃ»§ÊäÈëµÄ²éÑ¯Óï¾ä²¢µ÷ÓÃ¶ÔÓ¦µÄAPIÀàÀïµÄº¯Êı
+//ä½œç”¨ï¼šè´Ÿè´£è§£æç”¨æˆ·è¾“å…¥çš„æŸ¥è¯¢è¯­å¥å¹¶è°ƒç”¨å¯¹åº”çš„APIç±»é‡Œçš„å‡½æ•°
 #pragma endregion
 
 #include "QueryParser.h"
@@ -11,33 +11,33 @@
 #include<iostream>
 using namespace std;
 
-/*QueryParser¹¹Ôìº¯Êı*/
+/*QueryParseræ„é€ å‡½æ•°*/
 QueryParser::QueryParser()
 {
-	sql_type_ = -1;/*Ä¬ÈÏÉèÖÃ±äÁ¿sql_type_Îª-1*/
-	string path = boost::filesystem::initial_path<boost::filesystem::path>().string() + "/DATABASEData/"; /*»ñÈ¡µ±Ç°ÎÄ¼şexeÉèÖÃµØÖ·*/
-	if (!boost::filesystem::exists(path))/*ÅĞ¶ÏÎÄ¼şÊÇ·ñ´æÔÚ£¬²»´æÔÚ¾Í´´½¨ÎÄ¼ş*/
+	sql_type_ = -1;/*é»˜è®¤è®¾ç½®å˜é‡sql_type_ä¸º-1*/
+	string path = boost::filesystem::initial_path<boost::filesystem::path>().string() + "/DATABASEData/"; /*è·å–å½“å‰æ–‡ä»¶exeè®¾ç½®åœ°å€*/
+	if (!boost::filesystem::exists(path))/*åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œä¸å­˜åœ¨å°±åˆ›å»ºæ–‡ä»¶*/
 	{
 		boost::filesystem::create_directory(path);
 	}
-	api = new API(path);/*ÉèÖÃapi±äÁ¿*/
+	api = new API(path);/*è®¾ç½®apiå˜é‡*/
 }
 
-/*QueryParserµÄÎö¹¹º¯Êı*/
+/*QueryParserçš„ææ„å‡½æ•°*/
 QueryParser::~QueryParser(void)
 {
 	delete api;
 }
 
-/*¶ÔÍâ½Ó¿Ú£¬¸ù¾İsqlÀ´Ö´ĞĞÏàÓ¦µÄ²Ù×÷*/
+/*å¯¹å¤–æ¥å£ï¼Œæ ¹æ®sqlæ¥æ‰§è¡Œç›¸åº”çš„æ“ä½œ*/
 void QueryParser::ExecuteSQL(string sql)
 {
 	try
 	{
-		sql_ = sql;/*»ñÈ¡ÓÃ»§ÊäÈëµÄSQLÓï¾ä*/
-		FormateSQL();/*¹æ·¶»¯ÓÃ»§ÊäÈëµÄsql*/
-		GetSqlType();/*»ñÈ¡SQLÓï¾äµÄÀàĞÍ*/
-		InvokeAPI();/*¸ù¾İÀàĞÍµ÷ÓÃ¶ÔÓ¦µÄAPIº¯Êı*/
+		sql_ = sql;/*è·å–ç”¨æˆ·è¾“å…¥çš„SQLè¯­å¥*/
+		FormateSQL();/*è§„èŒƒåŒ–ç”¨æˆ·è¾“å…¥çš„sql*/
+ 		GetSqlType();/*è·å–SQLè¯­å¥çš„ç±»å‹*/
+		InvokeAPI();/*æ ¹æ®ç±»å‹è°ƒç”¨å¯¹åº”çš„APIå‡½æ•°*/
 	}
 	catch (exception e)
 	{
@@ -45,56 +45,36 @@ void QueryParser::ExecuteSQL(string sql)
 	}
 }
 
-/*¹æ·¶»¯ÓÃ»§ÊäÈëµÄsql£¬±ãÓÚºóĞø²ğ·Ö*/
+/*è§„èŒƒåŒ–ç”¨æˆ·è¾“å…¥çš„sqlï¼Œä¾¿äºåç»­æ‹†åˆ†*/
 void QueryParser::FormateSQL()
 {
-	//boost::regex reg("[\r\n\t]");
-	//sql_ = boost::regex_replace(sql_, reg, " ");/*»»ĞĞ¡¢tab¼üÓÃ¿Õ°×·û" "´úÌæ*/
-	//reg = ";.*$";
-	//sql_ = boost::regex_replace(sql_, reg, "");/*È¥³ı·ÖºÅÖ®ºóµÄÄÚÈİ*/
-	//reg = "(^ +)|( +$)";
-	//sql_ = boost::regex_replace(sql_, reg, "");/*È¥³ı×îÇ°ºÍ×îºóµÄ¿Õ°×·û*/
-	//reg = " +";
-	//sql_ = boost::regex_replace(sql_, reg, " ");/*È¥³ıÖØ¸´µÄ¿Õ°×·û*/
-	//reg = " ?(\\(|\\)|,|=|(<>)|<|>) ?";
-	//sql_ = boost::regex_replace(sql_, reg, " $1 ");
-	//reg = "< *>";
-	//sql_ = boost::regex_replace(sql_, reg, "<>");
-	//reg = "< *=";
-	//sql_ = boost::regex_replace(sql_, reg, "<=");
-	//reg = "> *=";
-	//sql_ = boost::regex_replace(sql_, reg, ">=");/*ÔÚ( ) , = <> < >ÕâĞ©×Ö·ûÖ®Ç°Ö®ºóÌí¼Ó¿Õ°×·û" "*/
-
-	//sql_vector_ = SplitSQL(sql_, " ");
-	// remove newlines, tabs
 	boost::regex reg("[\r\n\t]");
-	//string newstr(" ");
+	/*æ¢è¡Œã€tabé”®ç”¨ç©ºç™½ç¬¦" "ä»£æ›¿*/
 	sql_ = boost::regex_replace(sql_, reg, " ");
-	// remove ; and chars after ;
+	/*å»é™¤åˆ†å·ä¹‹åçš„å†…å®¹*/
 	reg = ";.*$";
-	//string newstr(" ");
+	/*å»é™¤æœ€å‰å’Œæœ€åçš„ç©ºç™½ç¬¦*/
 	sql_ = boost::regex_replace(sql_, reg, "");
-	// remove leading spaces and trailing spaces
 	reg = "(^ +)|( +$)";
+	/*å»é™¤é‡å¤çš„ç©ºç™½ç¬¦*/
 	sql_ = boost::regex_replace(sql_, reg, "");
-	// remove duplicate spaces
 	reg = " +";
 	sql_ = boost::regex_replace(sql_, reg, " ");
-	// insert space before or after ( ) , = <> < >
+	/*åœ¨ ( ) . , = <> < >è¿™äº›å­—ç¬¦ä¹‹å‰ä¹‹åæ·»åŠ ç©ºç™½ç¬¦" "*/
 	reg = " ?(\\(|\\)|,|=|(<>)|<|>) ?";
 	sql_ = boost::regex_replace(sql_, reg, " $1 ");
+	/*å»é™¤å…¶ä»–å­—ç¬¦*/
 	reg = "< *>";
 	sql_ = boost::regex_replace(sql_, reg, "<>");
 	reg = "< *=";
 	sql_ = boost::regex_replace(sql_, reg, "<=");
 	reg = "> *=";
 	sql_ = boost::regex_replace(sql_, reg, ">=");
-
-	// split sql_statement_
+	
 	sql_vector_ = SplitSQL(sql_, " ");
 }
 
-/*²ğ·ÖsqlÓï¾ä£¬½«Ã¿¸öµ¥´Ê·ÅÈëvectorÖĞ*/
+/*æ‹†åˆ†sqlè¯­å¥ï¼Œå°†æ¯ä¸ªå•è¯æ”¾å…¥vectorä¸­*/
 vector<string> QueryParser::SplitSQL(string sql, string seg)
 {
 	//int loc = sql.find(seg);
@@ -121,16 +101,16 @@ vector<string> QueryParser::SplitSQL(string sql, string seg)
 	return arr;
 }
 
-/*»ñÈ¡sqlÓï¾äµÄÀàĞÍ*/
+/*è·å–sqlè¯­å¥çš„ç±»å‹*/
 void  QueryParser::GetSqlType()
 {
-	if (sql_vector_.size() == 0)
+ 	if (sql_vector_.size() == 0)
 	{
 		sql_type_ = -1;
-		cout << "sqlÓï¾äÀàĞÍÎ´Öª" << endl;
+		cout << "sqlè¯­å¥ç±»å‹æœªçŸ¥"<<endl;
 		return;
 	}
-	boost::algorithm::to_lower(sql_vector_[0]);/*Ê¹sqlµÚÒ»¸ö´ÊĞ¡Ğ´±ãÓÚºóĞøÅĞ¶Ï*/
+	boost::algorithm::to_lower(sql_vector_[0]);/*ä½¿sqlç¬¬ä¸€ä¸ªè¯å°å†™ä¾¿äºåç»­åˆ¤æ–­*/
 	if (sql_vector_[0] == "help")
 	{
 		sql_type_ = 11;
@@ -140,26 +120,26 @@ void  QueryParser::GetSqlType()
 		if (sql_vector_.size() <= 1)
 		{
 			sql_type_ = -1;
-			cout << "createÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·createÓïÒå" << endl;
+			cout << "createå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®createè¯­ä¹‰"<<endl;
 			return;
 		}
-		boost::algorithm::to_lower(sql_vector_[1]);/*Ê¹sqlµÚ¶ş¸ö´ÊĞ¡Ğ´±ãÓÚºóĞøÅĞ¶Ï*/
-		if (sql_vector_[1] == "database")/*sqlÓï¾äÀàĞÍÎª£ºĞÂ½¨Êı¾İ¿â Code:21*/
+		boost::algorithm::to_lower(sql_vector_[1]);/*ä½¿sqlç¬¬äºŒä¸ªè¯å°å†™ä¾¿äºåç»­åˆ¤æ–­*/
+		if (sql_vector_[1] == "database")/*sqlè¯­å¥ç±»å‹ä¸ºï¼šæ–°å»ºæ•°æ®åº“ Code:21*/
 		{
 			sql_type_ = 21;
 		}
-		else if (sql_vector_[1] == "table")/*sqlÓï¾äÀàĞÍÎª£ºĞÂ½¨Êı¾İ±í Code:22*/
+		else if (sql_vector_[1] == "table")/*sqlè¯­å¥ç±»å‹ä¸ºï¼šæ–°å»ºæ•°æ®è¡¨ Code:22*/
 		{
 			sql_type_ = 22;
 		}
-		else if (sql_vector_[1] == "index")/*sqlÓï¾äÀàĞÍÎª£ºĞÂ½¨Ë÷Òı Code:23*/
+		else if(sql_vector_[1]=="index")/*sqlè¯­å¥ç±»å‹ä¸ºï¼šæ–°å»ºç´¢å¼• Code:23*/
 		{
 			sql_type_ = 23;
 		}
 		else
 		{
 			sql_type_ = -1;
-			cout << "createÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·createÓïÒå" << endl;
+			cout << "createå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®createè¯­ä¹‰"<<endl;
 			return;
 		}
 	}
@@ -168,22 +148,22 @@ void  QueryParser::GetSqlType()
 		if (sql_vector_.size() <= 1)
 		{
 			sql_type_ = -1;
-			cout << "showÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·showÓïÒå" << endl;
+			cout << "showå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®showè¯­ä¹‰"<<endl;
 			return;
 		}
-		boost::algorithm::to_lower(sql_vector_[1]);/*Ê¹sqlµÚ¶ş¸ö´ÊĞ¡Ğ´±ãÓÚºóĞøÅĞ¶Ï*/
-		if (sql_vector_[1] == "databases") /*sqlÓï¾äÀàĞÍÎª£º²é¿´Êı¾İ¿â Code:31*/
-		{
-			sql_type_ = 31;
+		boost::algorithm::to_lower(sql_vector_[1]);/*ä½¿sqlç¬¬äºŒä¸ªè¯å°å†™ä¾¿äºåç»­åˆ¤æ–­*/
+		if (sql_vector_[1] == "databases") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šæŸ¥çœ‹æ•°æ®åº“ Code:31*/
+		{ 
+			sql_type_ = 31; 
 		}
-		else if (sql_vector_[1] == "tables") /*sqlÓï¾äÀàĞÍÎª£º²é¿´Êı¾İ±í Code:32*/
+		else if (sql_vector_[1] == "tables") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šæŸ¥çœ‹æ•°æ®è¡¨ Code:32*/
 		{
-			sql_type_ = 32;
-		}
+			sql_type_ = 32; 
+		} 
 		else
 		{
 			sql_type_ = -1;
-			cout << "showÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·showÓïÒå" << endl;
+			cout << "showå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®showè¯­ä¹‰" << endl;
 			return;
 		}
 	}
@@ -192,52 +172,57 @@ void  QueryParser::GetSqlType()
 		if (sql_vector_.size() <= 1)
 		{
 			sql_type_ = -1;
-			cout << "dropÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·dropÓïÒå" << endl;
+			cout << "dropå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®dropè¯­ä¹‰" << endl;
 			return;
 		}
-		boost::algorithm::to_lower(sql_vector_[1]);/*Ê¹sqlµÚ¶ş¸ö´ÊĞ¡Ğ´±ãÓÚºóĞøÅĞ¶Ï*/
-		if (sql_vector_[1] == "database") /*sqlÓï¾äÀàĞÍÎª£ºÉ¾³ıÊı¾İ¿â Code:41*/
+		boost::algorithm::to_lower(sql_vector_[1]);/*ä½¿sqlç¬¬äºŒä¸ªè¯å°å†™ä¾¿äºåç»­åˆ¤æ–­*/
+		if (sql_vector_[1] == "database") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šåˆ é™¤æ•°æ®åº“ Code:41*/
 		{
 			sql_type_ = 41;
 		}
-		else if (sql_vector_[1] == "table") /*sqlÓï¾äÀàĞÍÎª£ºÉ¾³ıÊı¾İ±í Code:42*/
+		else if (sql_vector_[1] == "table") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šåˆ é™¤æ•°æ®è¡¨ Code:42*/
 		{
 			sql_type_ = 42;
 		}
-		else if (sql_vector_[1] == "index") /*sqlÓï¾äÀàĞÍÎª£ºÉ¾³ıÊı¾İ±í Code:42*/
+		else if (sql_vector_[1] == "index") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šåˆ é™¤æ•°æ®è¡¨ Code:42*/
 		{
 			sql_type_ = 43;
 		}
 		else
 		{
 			sql_type_ = -1;
-			cout << "dropÊ§°Ü,ÇëÀûÓÃÃüÁîhelp²é¿´ÕıÈ·dropÓïÒå" << endl;
+			cout << "dropå¤±è´¥,è¯·åˆ©ç”¨å‘½ä»¤helpæŸ¥çœ‹æ­£ç¡®dropè¯­ä¹‰" << endl;
 			return;
 		}
 	}
-	else if (sql_vector_[0] == "insert")  /*sqlÓï¾äÀàĞÍÎª£º²åÈëÊı¾İ Code:51*/
+	else if (sql_vector_[0] == "insert")  /*sqlè¯­å¥ç±»å‹ä¸ºï¼šæ’å…¥æ•°æ® Code:51*/
+	{ 
+		sql_type_ = 51; 
+	} 
+	else if (sql_vector_[0] == "select")  /*sqlè¯­å¥ç±»å‹ä¸ºï¼šæŸ¥è¯¢æ•°æ® Code:61*/
 	{
-		sql_type_ = 51;
-	}
-	else if (sql_vector_[0] == "select")  /*sqlÓï¾äÀàĞÍÎª£º²éÑ¯Êı¾İ Code:61*/
-	{
-
-		if (sql_vector_.size()>4 && sql_vector_[4] == "join")
+		bool flag = true;
+		for (int i = 0; i < sql_vector_.size(); i++)
 		{
-			sql_type_ = 62;
+			if (sql_vector_[i] == "join")
+			{
+				sql_type_ = 62;
+				flag = false;
+				break;
+			}
 		}
-		else
+		if(flag)
 		{
 			sql_type_ = 61;
 		}
+	} 
+	else if (sql_vector_[0] == "delete") /*sqlè¯­å¥ç±»å‹ä¸ºï¼šåˆ é™¤æ•°æ® Code:71*/
+	{ 
+		sql_type_ = 71; 
 	}
-	else if (sql_vector_[0] == "delete") /*sqlÓï¾äÀàĞÍÎª£ºÉ¾³ıÊı¾İ Code:71*/
+	else if (sql_vector_[0] == "update")  /*sqlè¯­å¥ç±»å‹ä¸ºï¼šæ›´æ–°æ•°æ® Code:81*/
 	{
-		sql_type_ = 71;
-	}
-	else if (sql_vector_[0] == "update")  /*sqlÓï¾äÀàĞÍÎª£º¸üĞÂÊı¾İ Code:81*/
-	{
-		sql_type_ = 81;
+		sql_type_ = 81; 
 	}
 	else if (sql_vector_[0] == "use")
 	{
@@ -246,11 +231,11 @@ void  QueryParser::GetSqlType()
 	else
 	{
 		sql_type_ = -1;
-		cout << "sqlÓï¾äÀàĞÍÎ´Öª" << endl;
+		cout << "sqlè¯­å¥ç±»å‹æœªçŸ¥" << endl;
 	}
 }
 
-/*¸ù¾İsqlÀàĞÍµ÷ÓÃ¶ÔÓ¦µÄapi*/
+/*æ ¹æ®sqlç±»å‹è°ƒç”¨å¯¹åº”çš„api*/
 void QueryParser::InvokeAPI()
 {
 	try
@@ -361,16 +346,17 @@ void QueryParser::InvokeAPI()
 			break;
 		}
 	}
-	catch (SyntaxErrorException& e) { cerr << "Error: ÓïÒå´íÎó!" << endl; }
-	catch (NoDatabaseSelectedException& e) { cerr << "Error:Î´Ñ¡¶¨µ±Ç°Êı¾İ¿â£¡" << endl; }
-	catch (DatabaseNotExistException& e) { cerr << "Error:Êı¾İ¿â²»´æÔÚ!" << endl; }
-	catch (DatabaseAlreadyExistsException& e) { cerr << "Error:¸ÃÊı¾İ¿âÒÑ´æÔÚ!" << endl; }
-	catch (TableNotExistException& e) { cerr << "Error:Êı¾İ±í²»´æÔÚ!" << endl; }
-	catch (TableAlreadyExistsException& e) { cerr << "Error:¸ÃÊı¾İ±íÒÑ´æÔÚ!" << endl; }
-	catch (IndexAlreadyExistsException& e) { cerr << "Error:¸ÃË÷ÒıÒÑ´æÔÚ!" << endl; }
-	catch (IndexNotExistException& e) { cerr << "Error:Ë÷Òı²»´æÔÚ!" << endl; }
-	catch (OneIndexEachTableException& e) { cerr << "Error: Ã¿Ò»¸ö±íÖ»ÄÜÓÉÒ»¸öË÷Òı!" << endl; }
-	catch (BPlusTreeException& e) { cerr << "Error: B++Ê÷´íÎó!" << endl; }
-	catch (IndexMustBeCreatedOnPrimaryKeyException& e) { cerr << "Error: Ë÷Òı±ØĞë½¨Á¢ÔÚÖ÷¼üÉÏ!" << endl; }
-	catch (PrimaryKeyConflictException& e) { cerr << "Error: Ö÷¼ü³åÍ»!" << endl; }
+	catch (SyntaxErrorException& e) { cerr << "Error: è¯­ä¹‰é”™è¯¯!" << endl; }
+	catch (NoDatabaseSelectedException& e) { cerr << "Error:æœªé€‰å®šå½“å‰æ•°æ®åº“ï¼" << endl; }
+	catch (DatabaseNotExistException& e) { cerr << "Error:æ•°æ®åº“ä¸å­˜åœ¨!" << endl; }
+	catch (DatabaseAlreadyExistsException& e) { cerr << "Error:è¯¥æ•°æ®åº“å·²å­˜åœ¨!" << endl; }
+	catch (AttributeNotExistException & e) { cerr << "Error:è¦æŸ¥è¯¢çš„å­—æ®µä¸å­˜åœ¨ï¼" << endl; }
+	catch (TableNotExistException& e) { cerr << "Error:æ•°æ®è¡¨ä¸å­˜åœ¨!" << endl; }
+	catch (TableAlreadyExistsException& e) { cerr << "Error:è¯¥æ•°æ®è¡¨å·²å­˜åœ¨!" << endl; }
+	catch (IndexAlreadyExistsException& e) { cerr << "Error:è¯¥ç´¢å¼•å·²å­˜åœ¨!" << endl; }
+	catch (IndexNotExistException& e) { cerr << "Error:ç´¢å¼•ä¸å­˜åœ¨!" << endl; }
+	catch (OneIndexEachTableException& e) { cerr << "Error: æ¯ä¸€ä¸ªè¡¨åªèƒ½ç”±ä¸€ä¸ªç´¢å¼•!" << endl; }
+	catch (BPlusTreeException& e) { cerr << "Error: B++æ ‘é”™è¯¯!" << endl; }
+	catch (IndexMustBeCreatedOnPrimaryKeyException& e) { cerr << "Error: ç´¢å¼•å¿…é¡»å»ºç«‹åœ¨ä¸»é”®ä¸Š!" << endl; }
+	catch (PrimaryKeyConflictException& e) { cerr << "Error: ä¸»é”®å†²çª!" << endl; }
 }
