@@ -1,5 +1,5 @@
 
-//Implemented by Lai ZhengMin  & XuJing
+//Implemented by Lai ZhengMin & Xu Jing
 
 #pragma once
 #ifndef _RECORDMANAGER_H_
@@ -7,43 +7,43 @@
 
 #include <string>
 #include <vector>
-
+#include "QueryParser.h"
 #include "SQLStatement.h"
 #include "BufferManager.h"
 #include "CatalogManager.h"
 #include "Exceptions.h"
 #include "BlockInfo.h"
-//Ò»¸öÊı¾İ¿âÓĞºÜ¶à±í£¨¿ÉÒÔ¿´×öÊÇ¶Î£¬±íÃû´ú±í¶ÎºÅ£©£¬±íÊÇÓÃ¿é£¨¿ÉÒÔ¿´×öÊÇÒ³£¬¿éºÅ´ú±íÒ³ºÅ£©µÄ¼¯ºÏ´æ´¢µÄ£¬¶ø¼ÇÂ¼ÊÇ´æÔÚ¿éÄÚµÄ£¬¼ÇÂ¼Í¨¹ı¿éÄÚ£¨Ò³ÄÚ£©µÄÆ«ÒÆÁ¿µÃµ½¡£
+//ä¸€ä¸ªæ•°æ®åº“æœ‰å¾ˆå¤šè¡¨ï¼ˆå¯ä»¥çœ‹åšæ˜¯æ®µï¼Œè¡¨åä»£è¡¨æ®µå·ï¼‰ï¼Œè¡¨æ˜¯ç”¨å—ï¼ˆå¯ä»¥çœ‹åšæ˜¯é¡µï¼Œå—å·ä»£è¡¨é¡µå·ï¼‰çš„é›†åˆå­˜å‚¨çš„ï¼Œè€Œè®°å½•æ˜¯å­˜åœ¨å—å†…çš„ï¼Œè®°å½•é€šè¿‡å—å†…ï¼ˆé¡µå†…ï¼‰çš„åç§»é‡å¾—åˆ°ã€‚
 using namespace std;
-//¼ÇÂ¼£¨tuple£©¹ÜÀíÆ÷
+//è®°å½•ï¼ˆtupleï¼‰ç®¡ç†å™¨
 class RecordManager
 {
 public:
 	RecordManager(CatalogManager *cm, BufferManager *bm, string dbname);
 	~RecordManager(void);
-
+	string intToString(int x);
 	void Insert(SQLInsert& st);
-	void Select(SQLSelect& st);
+	vector<vector<TKey>> Select(SQLSelect& st);
+	void JoinSelect(SQLJoinSelect& st);
 	void Delete(SQLDelete& st);
 	void Update(SQLUpdate& st);
-	//·µ»Ø±íÖĞ¿éºÅÎªblock_numµÄ¿é
+	//è¿”å›è¡¨ä¸­å—å·ä¸ºblock_numçš„å—
 	BlockInfo* GetBlockInfo(Table* tbl, int block_num);
-	//·µ»Øtb1µÚblock_num¿éµÄµÚoffset¸ötuple
+	//è¿”å›tb1ç¬¬block_numå—çš„ç¬¬offsetä¸ªtuple
 	vector<TKey> GetRecord(Table* tbl, int block_num, int offset);
-	//É¾³ı±íÄÚµÚblock_num¿éµÄµÚoffset¸ö¼ÇÂ¼
+	//åˆ é™¤è¡¨å†…ç¬¬block_numå—çš„ç¬¬offsetä¸ªè®°å½•
 	void DeleteRecord(Table* tbl, int block_num, int offset);
-	//ÓÃÊı¾İÀàĞÍ¼¯ºÏºÍkey¼¯ºÏ¸üĞÂ±íÄÚµÚblock_num¿éµÄµÚoffset¸ö¼ÇÂ¼
-	void UpdateRecord(Table* tbl, int block_num, int offset, vector<int>& indices/*Êı¾İÀàĞÍ¼¯ºÏ*/, vector<TKey>& values/*Ã¿¸öÊı¾İÀàĞÍ¶ÔÓ¦µÄ¼üÖµ¼¯ºÏ*/);
-	//¶ÔÓÚ±ítb1µÄÄ³ĞĞ¼üÖµ¼¯ºÏÊÇ·ñÂú×ãwhere×Ó¾ä
+	//ç”¨æ•°æ®ç±»å‹é›†åˆå’Œkeyé›†åˆæ›´æ–°è¡¨å†…ç¬¬block_numå—çš„ç¬¬offsetä¸ªè®°å½•
+	void UpdateRecord(Table* tbl, int block_num, int offset, vector<int>& indices/*æ•°æ®ç±»å‹é›†åˆ*/, vector<TKey>& values/*æ¯ä¸ªæ•°æ®ç±»å‹å¯¹åº”çš„é”®å€¼é›†åˆ*/);
+	//å¯¹äºè¡¨tb1çš„æŸè¡Œé”®å€¼é›†åˆæ˜¯å¦æ»¡è¶³whereå­å¥
 	bool SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where);
 
-	/**********************                  ¾Û¼¯º¯ÊıÊµÏÖ                      ********************************/
-	//xj0616	aggregation
-	TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex);
-	TKey RecordManager::Max(vector<vector<TKey> > tuples, int MinIndex);
-	TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex);
-	int RecordManager::Count(vector<vector<TKey> > tuples, int Index);
-
+	/**********************    èšé›†å‡½æ•°å®ç°  ***************************/
+	//xj 06/16	aggregation
+	TKey Min(vector<vector<TKey>> tuples, int MinIndex);
+	TKey Max(vector<vector<TKey>> tuples, int MinIndex);
+	TKey* Avg(vector<vector<TKey>> tuples, int MinIndex);
+	int Count(vector<TKey> tuples, int Index);
 private:
 	CatalogManager* catalog_m_;
 	BufferManager* buffer_m_;
