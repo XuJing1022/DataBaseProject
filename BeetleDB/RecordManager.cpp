@@ -1,6 +1,6 @@
-//Implemented by Lai ZhengMin & XuJing
+//Implemented by Lai ZhengMin & Xu Jing
 
-//¶¨³¤¼ÇÂ¼=sum(ÊôĞÔ),¿éµÄ±àºÅÊÇ´Ó´óµ½Ğ¡µÄ(block->preNum=block->getNum()+1)
+//å®šé•¿è®°å½•=sum(å±æ€§),å—çš„ç¼–å·æ˜¯ä»å¤§åˆ°å°çš„(block->preNum=block->getNum()+1)
 #include "RecordManager.h"
 #include "BPlusTree.h"
 #include "ConstValue.h"
@@ -12,23 +12,32 @@ RecordManager::RecordManager(CatalogManager *cm, BufferManager *bm, string dbnam
 
 RecordManager::~RecordManager(void) {}
 
+string RecordManager::intToString(int x)
+{
+	char t[1000];
+	string s;
+	sprintf(t, "%d", x);
+	s = t;
+	return s;
+}
+
 void RecordManager::Insert(SQLInsert& st)
 {
 	string tb_name = st.get_tb_name();
-	//Õâ¸ö´ı²å¼ÇÂ¼ÓĞ¶àÉÙ¸ökey value
+	//è¿™ä¸ªå¾…æ’è®°å½•æœ‰å¤šå°‘ä¸ªkey value
 	int values_size = st.GetValues().size();
-	//¸ù¾İ±íÃû£¬´ÓÄ¿Â¼ÎÄ¼şÏÂÄÃµ½Êı¾İ¿âÖĞµÄ±í
+	//æ ¹æ®è¡¨åï¼Œä»ç›®å½•æ–‡ä»¶ä¸‹æ‹¿åˆ°æ•°æ®åº“ä¸­çš„è¡¨
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(tb_name);
 	if (tb == NULL) throw TableNotExistException();
 
-	//Ò»¿é£¨4K£¬Í·12 bytes£©ÄÜ×°¶àÉÙ¸ö¼ÇÂ¼£¨tuple£©
+	//ä¸€å—ï¼ˆ4Kï¼Œå¤´12 bytesï¼‰èƒ½è£…å¤šå°‘ä¸ªè®°å½•ï¼ˆtupleï¼‰
 	int max_count = (4096 - 12) / (tb->get_record_length());
 
 	vector<TKey> tkey_values;
 
 	int primary_key_index = -1;
 
-	//±éÀú´ı²å¼ÇÂ¼£¬¿´ÊÇ·ñÓĞÖ÷¼ü£¬²¢°ÑÊı¾İÀàĞÍºÍ¼üÖµ´æµ½tkey_valuesÖĞ
+	//éå†å¾…æ’è®°å½•ï¼Œçœ‹æ˜¯å¦æœ‰ä¸»é”®ï¼Œå¹¶æŠŠæ•°æ®ç±»å‹å’Œé”®å€¼å­˜åˆ°tkey_valuesä¸­
 	for (int i = 0; i < values_size; i++)
 	{
 		int value_type = st.GetValues()[i].data_type;
@@ -42,31 +51,31 @@ void RecordManager::Insert(SQLInsert& st)
 		if (tb->GetAttributes()[i].get_attr_type() == 1)
 			primary_key_index = i;
 	}
-	//Èç¹ûÓĞÖ÷¼ü
+	//å¦‚æœæœ‰ä¸»é”®
 	if (primary_key_index != -1)
 	{
-		//Èç¹ûÓĞË÷Òı
+		//å¦‚æœæœ‰ç´¢å¼•
 		if (tb->GetIndexNum() != 0)
 		{
 			BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
 			if (tree.GetVal(tkey_values[primary_key_index]) != -1)
 				throw PrimaryKeyConflictException();
 		}
-		//ÎŞË÷Òı
+		//æ— ç´¢å¼•
 		else
 		{
-			//ÄÃµ½¸Ã±íµÄÆğÊ¼¿éºÅ 
+			//æ‹¿åˆ°è¯¥è¡¨çš„èµ·å§‹å—å· 
 			int block_num = tb->get_first_block_num();
-			//±éÀú±íÖĞµÄ¿é£¬¿´²åÈëµÄÊı¾İÊÇ·ñ»á·¢ÉúÖ÷¼ü³åÍ»
+			//éå†è¡¨ä¸­çš„å—ï¼Œçœ‹æ’å…¥çš„æ•°æ®æ˜¯å¦ä¼šå‘ç”Ÿä¸»é”®å†²çª
 			for (int i = 0; i < tb->get_block_count(); i++)
 			{
-				//ÄÃµ½¸Ã¿éºÅ¶ÔÓ¦µÄ¿éĞÅÏ¢
+				//æ‹¿åˆ°è¯¥å—å·å¯¹åº”çš„å—ä¿¡æ¯
 				BlockInfo *bp = GetBlockInfo(tb, block_num);
 				for (int j = 0; j < bp->GetRecordCount(); j++)
 				{
-					//ÄÃµ½¿éÄÚµÄµÚj¸ö¼ÇÂ¼
+					//æ‹¿åˆ°å—å†…çš„ç¬¬jä¸ªè®°å½•
 					vector<TKey> tuple = GetRecord(tb, block_num, j);
-					//Èç¹ûÖ÷¼üÊôĞÔÖµ·¢Éú³åÍ»
+					//å¦‚æœä¸»é”®å±æ€§å€¼å‘ç”Ÿå†²çª
 					if (tuple[primary_key_index] == tkey_values[primary_key_index])
 						throw PrimaryKeyConflictException();
 				}
@@ -75,42 +84,42 @@ void RecordManager::Insert(SQLInsert& st)
 		}
 	}
 	char *content;
-	//¿ÉÓÃ¿éµÄÆğÊ¼¿éºÅ
+	//å¯ç”¨å—çš„èµ·å§‹å—å·
 	int use_block = tb->get_first_block_num();
-	//À¬»ø¿éµÄÆğÊ¼¿éºÅ
+	//åƒåœ¾å—çš„èµ·å§‹å—å·
 	int first_rubbish_block = tb->get_first_rubbish_num();
-	//¼ÇÂ¼ÉÏÒ»´ÎÊ¹ÓÃµÄ¿é
+	//è®°å½•ä¸Šä¸€æ¬¡ä½¿ç”¨çš„å—
 	int last_use_block;
 	int blocknum, offset;
-	//ÎŞ¿ÉÓÃ¿é
+	//æ— å¯ç”¨å—
 	while (use_block != -1)
 	{
 		last_use_block = use_block;
 		BlockInfo *bp = GetBlockInfo(tb, use_block);
-		//¿éÂúÁË
+		//å—æ»¡äº†
 		if (bp->GetRecordCount() == max_count)
 		{
 			use_block = bp->GetNextBlockNum();
 			continue;
 		}
-		//Î´Âú£¬ÔòÍùrecordÎ²²¿²åÈë¼ÇÂ¼
+		//æœªæ»¡ï¼Œåˆ™å¾€recordå°¾éƒ¨æ’å…¥è®°å½•
 		content = bp->GetContentAdress() + bp->GetRecordCount() * tb->get_record_length();
-		//¸´ÖÆÒ»¸ötuple£¬Ò²¾ÍÊÇ´Ó¿éµÄ¿ÕÏĞÎ»ÖÃ²åÈëÒ»¸ötuple
+		//å¤åˆ¶ä¸€ä¸ªtupleï¼Œä¹Ÿå°±æ˜¯ä»å—çš„ç©ºé—²ä½ç½®æ’å…¥ä¸€ä¸ªtuple
 		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
 		{
-			//¸´ÖÆ¸øcontent
+			//å¤åˆ¶ç»™content
 			memcpy(content, iter->get_key(), iter->get_length());
 			content += iter->get_length();
 		}
 		bp->SetRecordCount(1 + bp->GetRecordCount());
-		//¼ÇÂ¼²åÈëµÄ¿éºÅ
+		//è®°å½•æ’å…¥çš„å—å·
 		blocknum = use_block;
-		//¼ÇÂ¼¿éÄÚÆ«ÒÆÁ¿
+		//è®°å½•å—å†…åç§»é‡
 		offset = bp->GetRecordCount() - 1;
-		//¸üĞÂ¿éĞÅÏ¢
+		//æ›´æ–°å—ä¿¡æ¯
 		buffer_m_->WriteBlock(bp);
 
-		//Èç¹ûÓĞË÷Òı
+		//å¦‚æœæœ‰ç´¢å¼•
 		if (tb->GetIndexNum() != 0)
 		{
 			BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
@@ -123,66 +132,66 @@ void RecordManager::Insert(SQLInsert& st)
 				}
 			}
 		}
-		//½«¸üĞÂºóµÄ½á¹ûĞ´»Ø´ÅÅÌ
+		//å°†æ›´æ–°åçš„ç»“æœå†™å›ç£ç›˜
 		buffer_m_->WriteToDisk();
-		//½«Ä¿Â¼ĞÅÏ¢Ğ´»Ø´ÅÅÌ
+		//å°†ç›®å½•ä¿¡æ¯å†™å›ç£ç›˜
 		catalog_m_->WriteArchiveFile();
-		cout << "²åÈë³É¹¦£¡" << endl;
+		cout << "æ’å…¥æˆåŠŸï¼" << endl;
 		return;
 	}
-	//Èç¹ûÎŞ¿ÉÓÃ¿éµ«ÓĞÀ¬»ø¿é£¨ÒÑ¾­±»»ØÊÕµÄ¿Õ¿é£©£¬Ôò²åµ½À¬»ø¿éÖĞ
+	//å¦‚æœæ— å¯ç”¨å—ä½†æœ‰åƒåœ¾å—ï¼ˆå·²ç»è¢«å›æ”¶çš„ç©ºå—ï¼‰ï¼Œåˆ™æ’åˆ°åƒåœ¾å—ä¸­
 	if (first_rubbish_block != -1)
 	{
-		//ÄÃµ½µÚÒ»¸öÀ¬»ø¿é
+		//æ‹¿åˆ°ç¬¬ä¸€ä¸ªåƒåœ¾å—
 		BlockInfo *bp = GetBlockInfo(tb, first_rubbish_block);
 		content = bp->GetContentAdress();
-		//¸´ÖÆrecordµ½contentÖĞ
+		//å¤åˆ¶recordåˆ°contentä¸­
 		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
 		{
 			memcpy(content, iter->get_key(), iter->get_length());
 			content += iter->get_length();
 		}
-		//À¬»ø¿éµÄ¼ÇÂ¼Îª1
+		//åƒåœ¾å—çš„è®°å½•ä¸º1
 		bp->SetRecordCount(1);
-		//µÃµ½Ìø³öwhileÑ­»·Ö®Ç°µÄblock£¬ËûµÄnextBlockNumÎª-1
+		//å¾—åˆ°è·³å‡ºwhileå¾ªç¯ä¹‹å‰çš„blockï¼Œä»–çš„nextBlockNumä¸º-1
 		BlockInfo *last_use_block_p = GetBlockInfo(tb, last_use_block);
-		//°Ñfirst_rubbish_block¹ÒÔÚËûµÄºóÃæ
+		//æŠŠfirst_rubbish_blockæŒ‚åœ¨ä»–çš„åé¢
 		last_use_block_p->SetNextBlockNum(first_rubbish_block);
-		//°ÑÀ¬»ø¿éµÄÖ¸ÕëºóÒÆÒ»Î»
+		//æŠŠåƒåœ¾å—çš„æŒ‡é’ˆåç§»ä¸€ä½
 		tb->set_first_rubbish_num(bp->GetNextBlockNum());
-		//¸Ã¿éµÄÇ°Ò»¿éÎªlast_use_block
+		//è¯¥å—çš„å‰ä¸€å—ä¸ºlast_use_block
 		bp->SetPrevBlockNum(last_use_block);
 
-		//±íÃ÷¸Ã¿éµÄºóÃæÎŞ¿ÉÓÃ¿é
+		//è¡¨æ˜è¯¥å—çš„åé¢æ— å¯ç”¨å—
 		bp->SetNextBlockNum(-1);
-		//¸üĞÂ²åÈë¿éµÄ¿éºÅÎªfirst_rubbish_block
+		//æ›´æ–°æ’å…¥å—çš„å—å·ä¸ºfirst_rubbish_block
 		blocknum = first_rubbish_block;
-		//¿ìÄÚÆ«ÒÆÁ¿Îª0£¬ÒòÎªËüÊÇ¸Ã¿éµÄµÚÒ»Ìõ¼ÇÂ¼
+		//å¿«å†…åç§»é‡ä¸º0ï¼Œå› ä¸ºå®ƒæ˜¯è¯¥å—çš„ç¬¬ä¸€æ¡è®°å½•
 		offset = 0;
-		//½«bpºÍlast_use_block_pÉèÎªÔà¿é£¬µÈ´ı×îºóĞ´»Ø´ÅÅÌ
+		//å°†bpå’Œlast_use_block_pè®¾ä¸ºè„å—ï¼Œç­‰å¾…æœ€åå†™å›ç£ç›˜
 		buffer_m_->WriteBlock(bp);
 		buffer_m_->WriteBlock(last_use_block_p);
 	}
-	else//Èç¹ûµ±Ç°¼ÈÎŞ¿ÉÓÃ¿éÒ²ÎŞÀ¬»ø¿é¹©²åÈë£¬ÔòÒª´´½¨Ò»¸öĞÂ¿é
+	else//å¦‚æœå½“å‰æ—¢æ— å¯ç”¨å—ä¹Ÿæ— åƒåœ¾å—ä¾›æ’å…¥ï¼Œåˆ™è¦åˆ›å»ºä¸€ä¸ªæ–°å—
 	{
 		int next_block = tb->get_first_block_num();
-		//Èç¹û²»ÊÇµÚÒ»´Î²åÈë
+		//å¦‚æœä¸æ˜¯ç¬¬ä¸€æ¬¡æ’å…¥
 		if (next_block != -1)
 		{
 			BlockInfo *up = GetBlockInfo(tb, tb->get_first_block_num());
-			//ÉèÖÃËüÖ®Ç°µÄ¿éµÄ±àºÅÎªblock_count£¨±È×Ô¼º´ó1£©
+			//è®¾ç½®å®ƒä¹‹å‰çš„å—çš„ç¼–å·ä¸ºblock_countï¼ˆæ¯”è‡ªå·±å¤§1ï¼‰
 			up->SetPrevBlockNum(tb->get_block_count());
 			buffer_m_->WriteBlock(up);
 		}
-		//ÉèÖÃµÚÒ»¸ö¿ÉÓÃ¿éµÄ±àºÅ
+		//è®¾ç½®ç¬¬ä¸€ä¸ªå¯ç”¨å—çš„ç¼–å·
 		tb->set_first_block_num(tb->get_block_count());
-		//´´½¨Ò»¸öĞÂ¿é
+		//åˆ›å»ºä¸€ä¸ªæ–°å—
 		BlockInfo *bp = GetBlockInfo(tb, tb->get_first_block_num());
-		//ËüÇ°ÃæÎŞ¿é
+		//å®ƒå‰é¢æ— å—
 		bp->SetPrevBlockNum(-1);
-		//½«next_block¹ÒÔÚËûºóÃæ£¬prev_numÒª±È×Ô¼ºµÄnum´ó
+		//å°†next_blockæŒ‚åœ¨ä»–åé¢ï¼Œprev_numè¦æ¯”è‡ªå·±çš„numå¤§
 		bp->SetNextBlockNum(next_block);
-		//½«¼ÇÂ¼¼Ó1£¬°Ñ´ı²å¼ÇÂ¼´æµ½bp¿éÖĞ
+		//å°†è®°å½•åŠ 1ï¼ŒæŠŠå¾…æ’è®°å½•å­˜åˆ°bpå—ä¸­
 		bp->SetRecordCount(1);
 		content = bp->GetContentAdress();
 		for (auto iter = tkey_values.begin(); iter != tkey_values.end(); iter++)
@@ -190,16 +199,16 @@ void RecordManager::Insert(SQLInsert& st)
 			memcpy(content, iter->get_key(), iter->get_length());
 			content += iter->get_length();
 		}
-		//¸üĞÂ²åÈëµÄ¿éºÅ
+		//æ›´æ–°æ’å…¥çš„å—å·
 		blocknum = tb->get_block_count();
-		//¿éÄÚÆ«ÒÆÁ¿Îª0
+		//å—å†…åç§»é‡ä¸º0
 		offset = 0;
-		//ÉèÎªÔà¿é
+		//è®¾ä¸ºè„å—
 		buffer_m_->WriteBlock(bp);
-		//½«±íµÄ¿éÊı¼Ó1
+		//å°†è¡¨çš„å—æ•°åŠ 1
 		tb->IncreaseBlockCount();
 	}
-	//Èç¹ûÓĞindex,°Ñ¼ÇÂ¼²åµ½indexÖĞ
+	//å¦‚æœæœ‰index,æŠŠè®°å½•æ’åˆ°indexä¸­
 	if (tb->GetIndexNum() != 0)
 	{
 		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
@@ -212,24 +221,27 @@ void RecordManager::Insert(SQLInsert& st)
 			}
 		}
 	}
-	//½«bufferĞ´»Ø´ÅÅÌ
+	//å°†bufferå†™å›ç£ç›˜
 	buffer_m_->WriteToDisk();
 	catalog_m_->WriteArchiveFile();
-	cout << "²åÈë³É¹¦£¡" << endl;
+	cout << "æ’å…¥æˆåŠŸï¼" << endl;
 }
 
-void RecordManager::Select(SQLSelect& st)
+vector<vector<TKey>> RecordManager::Select(SQLSelect& st)
 {
-	string searchType = "ÆÕÍ¨²éÑ¯";
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
+	//ç­›é€‰çš„å­—æ®µçš„ä¸‹æ ‡é›†åˆ
 	vector<int> attribute_loc;
+	vector<vector<TKey> > tuples;
+	vector<vector<TKey>>result;
+	//éå†æŸ¥è¯¢çš„å­—æ®µå
 	for (auto i = st.get_select_attribute().begin(); i != st.get_select_attribute().end(); i++)
 	{
 		bool exits = false;
 		int loc = 0;
+		//éå†è¯¥è¡¨çš„å­—æ®µï¼Œå¦‚æœé‡åˆ°å’Œè¦æŸ¥è¯¢çš„å­—æ®µåä¸€æ ·çš„å­—æ®µï¼Œåˆ™æŠŠè¯¥è¡¨ç¬¬locä¸ªå­—æ®µæ”¾åˆ°attribute_locä¸­
 		for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++, loc++)
 		{
-
 			if (*i == "*" || attr->get_attr_name() == *i)
 			{
 				attribute_loc.push_back(loc);
@@ -242,17 +254,18 @@ void RecordManager::Select(SQLSelect& st)
 		}
 		if (exits == false)
 		{
-			cout << "²éÑ¯µÄ×Ö¶ÎÃûÔÚ¸Ã±íÖĞ²»´æÔÚ£¡" << endl;
-			return;
+			cout << "æŸ¥è¯¢çš„å­—æ®µååœ¨è¯¥è¡¨ä¸­ä¸å­˜åœ¨ï¼" << endl;
+
+			return result;
 		}
 	}
 
-	vector<vector<TKey> > tuples;
+
 	bool has_index = false;
 	int index_idx;
 	int where_idx;
 
-	//Èç¹ûÓĞindex,¿´¿´indexÊÇ·ñ×÷ÓÃÓÚ²éÑ¯µÄÊôĞÔÁĞÉÏ
+	//å¦‚æœæœ‰index,çœ‹çœ‹indexæ˜¯å¦ä½œç”¨äºæŸ¥è¯¢çš„å±æ€§åˆ—ä¸Š
 	if (tb->GetIndexNum() != 0)
 	{
 		for (auto i = 0; i < tb->GetIndexNum(); i++)
@@ -260,7 +273,7 @@ void RecordManager::Select(SQLSelect& st)
 			Index *idx = tb->GetIndex(i);
 			for (auto j = 0; j < st.GetWheres().size(); j++)
 			{
-				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type != SIGN_NE)//xj:forB+tree,pre:== SIGN_EQ
+				if (idx->get_attr_name() == st.GetWheres()[j].key_1 && st.GetWheres()[j].op_type == SIGN_EQ)
 				{
 					has_index = true;
 					index_idx = i;
@@ -269,7 +282,7 @@ void RecordManager::Select(SQLSelect& st)
 			}
 		}
 	}
-	//Èç¹û²éÑ¯µÄÁĞÃ»ÓĞindex,Ôò±éÀúËùÓĞblock
+	//å¦‚æœæŸ¥è¯¢çš„åˆ—æ²¡æœ‰index,åˆ™éå†æ‰€æœ‰block
 	if (!has_index)
 	{
 		int block_num = tb->get_first_block_num();
@@ -290,51 +303,47 @@ void RecordManager::Select(SQLSelect& st)
 			block_num = bp->GetNextBlockNum();
 		}
 	}
-	//Èç¹ûindex×÷ÓÃÓÚ¸ÃÁĞ£¬ÔòÓÃB+Ê÷½øĞĞËÑË÷
+	//å¦‚æœindexä½œç”¨äºè¯¥åˆ—ï¼Œåˆ™ç”¨B+æ ‘è¿›è¡Œæœç´¢
 	else
 	{
 		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
 
-		//Îªtkey½¨Ë÷Òı
+		//ä¸ºtkeyå»ºç´¢å¼•
 		int type = tb->GetIndex(index_idx)->get_key_type();
 		int length = tb->GetIndex(index_idx)->get_key_len();
 		string value = st.GetWheres()[where_idx].value;
 		TKey dest_key(type, length);
 		dest_key.ReadValue(value);
 
-		//xujing:µ¥Öµ²éÑ¯Óë·¶Î§²éÑ¯ ·ÖÖ§
-		vector<int> blocknumList = tree.GetVal(dest_key, st.GetWheres()[where_idx].op_type,searchType);
-		//int blocknum = tree.GetVal(dest_key);
-		//µÃµ½²éÑ¯½á¹û¼¯ºÏ
-		for (auto bnum = blocknumList.begin(); bnum != blocknumList.end(); bnum++) {
-			int blocknum = (*bnum);
-			if (blocknum != -1)
-			{
-				int blockoffset = blocknum;
-				//È¡¸ß16Î»£¬¼´Ç°2¸ö×Ö½Ú£¬´ú±í¿éºÅ
-				blocknum = blocknum >> 16;
-				//È¡µÍ16Î»£¬¼´ºóÁ½¸ö×Ö½Ú£¬´ú±í¿éÄÚÆ«ÒÆÁ¿
-				blocknum = blocknum && 0xffff;
-				//ÄÃµ½¸ù¾İ¿éºÅºÍ¿éÄÚÎ»ÒÆÄÃµ½µÚblockoffset¸ötuple
-				blockoffset = blockoffset & 0xffff;
+		int blocknum = tree.GetVal(dest_key);
 
-				vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
-				bool sats = true;
-				for (auto k = 0; k < st.GetWheres().size(); k++)
-				{
-					SQLWhere where = st.GetWheres()[k];
-					if (!SatisfyWhere(tb, tuple, where)) sats = false;
-				}
-				if (sats) tuples.push_back(tuple);
+		if (blocknum != -1)
+		{
+			int blockoffset = blocknum;
+			//å–é«˜16ä½ï¼Œå³å‰2ä¸ªå­—èŠ‚ï¼Œä»£è¡¨å—å·
+			blocknum = blocknum >> 16;
+			//å–ä½16ä½ï¼Œå³åä¸¤ä¸ªå­—èŠ‚ï¼Œä»£è¡¨å—å†…åç§»é‡
+			blocknum = blocknum && 0xffff;
+			//æ‹¿åˆ°æ ¹æ®å—å·å’Œå—å†…ä½ç§»æ‹¿åˆ°ç¬¬blockoffsetä¸ªtuple
+			blockoffset = blockoffset & 0xffff;
+
+			vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
+			bool sats = true;
+			for (auto k = 0; k < st.GetWheres().size(); k++)
+			{
+				SQLWhere where = st.GetWheres()[k];
+				if (!SatisfyWhere(tb, tuple, where)) sats = false;
 			}
+			if (sats) tuples.push_back(tuple);
 		}
 	}
 	if (tuples.size() == 0)
 	{
-		cout << "¿Õ±í£¨Empty table£©" << endl;
-		return;
+		cout << "ç©ºè¡¨ï¼ˆEmpty tableï¼‰!" << endl;
+
+		return result;
 	}
-	//´òÓ¡ÊôĞÔÃû
+	//æ‰“å°å±æ€§å
 	string sline = "";
 	for (int i = 0; i < attribute_loc.size(); i++)
 	{
@@ -351,51 +360,67 @@ void RecordManager::Select(SQLSelect& st)
 	cout << "|" << endl;
 	cout << sline << endl;
 
-	//xujing:¾Û¼¯º¯ÊıÊ¹ÓÃ
-	int index = 2;//1:µÚ2ÁĞÊôĞÔ
-				  //TKey min = Min(tuples, index);//testMin
-				  //TKey min = Max(tuples, index);//testMax
-				  //TKey* min = Avg(tuples, index);//testAvg:varcharÊ±·µ»Økey_=¡°¡±
-	int min = Count(tuples, index);//testCount
-								   //
-
-								   //´òÓ¡½á¹û
+	//æ‰“å°ç»“æœ
 	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++)
 	{
+		vector<TKey> reuslt_tuple;
 		for (int i = 0; i < attribute_loc.size(); i++)
 		{
+			//åªæ‰“å°é€‰æ‹©çš„å­—æ®µ
 			auto val = tuple->begin() + attribute_loc[i];
+			reuslt_tuple.push_back(*val);
 			cout << "| " << setw(10) << (*val);
 		}
-
-		//for (auto val = tuple->begin(); val != tuple->end(); val++)
-		//{
-		//	cout << "| "<< setw(10) << (*val);
-		//}
-
+		result.push_back(reuslt_tuple);
 		cout << "|" << endl;
 		cout << sline << endl;
 	}
 
-	//xujing:¾Û¼¯º¯Êı²âÊÔÊä³ö
-	cout << "| Result | " << setw(10) << min;//(*min);
-
-	cout << "| ²éÑ¯·½Ê½ | " << setw(10) << searchType << endl;
-	//Ë÷Òı´òÓ¡²âÊÔ
-	/*if (tb->GetIndexNum() != 0)
+	//æ‰“å°B+æ ‘
+	if (tb->GetIndexNum() != 0)
 	{
 		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
 		tree.Print();
-	}*/
+	}
+	return result;
 }
-void RecordManager::Delete(SQLDelete& st)
+
+/*void RecordManager::Select(SQLSelect& st)
 {
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
+	//ç­›é€‰çš„å­—æ®µçš„ä¸‹æ ‡é›†åˆ
+	vector<int> attribute_loc;
+	//éå†æŸ¥è¯¢çš„å­—æ®µå
+	for (auto i = st.get_select_attribute().begin(); i != st.get_select_attribute().end(); i++)
+	{
+		bool exits = false;
+		int loc = 0;
+		//éå†è¯¥è¡¨çš„å­—æ®µï¼Œå¦‚æœé‡åˆ°å’Œè¦æŸ¥è¯¢çš„å­—æ®µåä¸€æ ·çš„å­—æ®µï¼Œåˆ™æŠŠè¯¥è¡¨ç¬¬locä¸ªå­—æ®µæ”¾åˆ°attribute_locä¸­
+		for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++, loc++)
+		{
+			if (*i == "*" || attr->get_attr_name() == *i)
+			{
+				attribute_loc.push_back(loc);
+				exits = true;
+				if (*i != "*")
+				{
+					break;
+				}
+			}
+		}
+		if (exits == false)
+		{
+			cout << "æŸ¥è¯¢çš„å­—æ®µååœ¨è¯¥è¡¨ä¸­ä¸å­˜åœ¨ï¼"<<endl;
+			return;
+		}
+	}
+
+	vector<vector<TKey> > tuples; 
 	bool has_index = false;
 	int index_idx;
 	int where_idx;
 
-	//¿´ÊÇ·ñÓĞindex
+	//å¦‚æœæœ‰index,çœ‹çœ‹indexæ˜¯å¦ä½œç”¨äºæŸ¥è¯¢çš„å±æ€§åˆ—ä¸Š
 	if (tb->GetIndexNum() != 0)
 	{
 		for (auto i = 0; i < tb->GetIndexNum(); i++)
@@ -403,7 +428,7 @@ void RecordManager::Delete(SQLDelete& st)
 			Index *idx = tb->GetIndex(i);
 			for (auto j = 0; j < st.GetWheres().size(); j++)
 			{
-				if (idx->get_attr_name() == st.GetWheres()[j].key && st.GetWheres()[j].op_type == SIGN_EQ)
+				if (idx->get_attr_name() == st.GetWheres()[j].key_1 && st.GetWheres()[j].op_type == SIGN_EQ)
 				{
 					has_index = true;
 					index_idx = i;
@@ -412,7 +437,197 @@ void RecordManager::Delete(SQLDelete& st)
 			}
 		}
 	}
-	//Èç¹ûindex²»ÊÇ×÷ÓÃÓÚÉ¾³ıÁĞ£¬Ôò±éÀú¿é
+	//å¦‚æœæŸ¥è¯¢çš„åˆ—æ²¡æœ‰index,åˆ™éå†æ‰€æœ‰block
+	if (!has_index)
+	{
+		int block_num = tb->get_first_block_num();
+		for (int i = 0; i < tb->get_block_count(); i++)
+		{
+			BlockInfo *bp = GetBlockInfo(tb, block_num);
+			for (int j = 0; j < bp->GetRecordCount(); j++)
+			{
+				vector<TKey> tuple = GetRecord(tb, block_num, j);
+				bool sats = true;
+				for (auto k = 0; k < st.GetWheres().size(); k++)
+				{
+					SQLWhere where = st.GetWheres()[k];
+					if (!SatisfyWhere(tb, tuple, where)) sats = false;
+				}
+				if (sats) tuples.push_back(tuple);
+			}
+			block_num = bp->GetNextBlockNum();
+		}
+	}
+	//å¦‚æœindexä½œç”¨äºè¯¥åˆ—ï¼Œåˆ™ç”¨B+æ ‘è¿›è¡Œæœç´¢
+	else 
+	{
+		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
+
+		//ä¸ºtkeyå»ºç´¢å¼•
+		int type = tb->GetIndex(index_idx)->get_key_type();
+		int length = tb->GetIndex(index_idx)->get_key_len();
+		string value = st.GetWheres()[where_idx].value;
+		TKey dest_key(type, length);
+		dest_key.ReadValue(value);
+
+		int blocknum = tree.GetVal(dest_key);
+
+		if (blocknum != -1)
+		{
+			int blockoffset = blocknum;
+			//å–é«˜16ä½ï¼Œå³å‰2ä¸ªå­—èŠ‚ï¼Œä»£è¡¨å—å·
+			blocknum = blocknum >> 16;
+			//å–ä½16ä½ï¼Œå³åä¸¤ä¸ªå­—èŠ‚ï¼Œä»£è¡¨å—å†…åç§»é‡
+			blocknum = blocknum && 0xffff;
+			//æ‹¿åˆ°æ ¹æ®å—å·å’Œå—å†…ä½ç§»æ‹¿åˆ°ç¬¬blockoffsetä¸ªtuple
+			blockoffset = blockoffset & 0xffff;
+
+			vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
+			bool sats = true;
+			for (auto k = 0; k < st.GetWheres().size(); k++)
+			{
+				SQLWhere where = st.GetWheres()[k];
+				if (!SatisfyWhere(tb, tuple, where)) sats = false;
+			}
+			if (sats) tuples.push_back(tuple);
+		}
+	}
+	if (tuples.size() == 0)
+	{
+		cout << "ç©ºè¡¨ï¼ˆEmpty tableï¼‰!"<<endl;
+		return;
+	}
+	//æ‰“å°å±æ€§å
+	string sline = "";
+	for (int i = 0; i < attribute_loc.size(); i++)
+	{
+		cout << "+----------";
+		sline += "+----------";
+	}
+	cout << "+" << endl;
+	sline += "+";
+
+	for (int i = 0; i<attribute_loc.size(); i++)
+	{
+		cout << "| " << setw(9) << left << tb->GetAttributes()[attribute_loc[i]].get_attr_name();
+	}
+	cout << "|" << endl;
+	cout << sline << endl;
+	//æ‰“å°ç»“æœ
+	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++)
+	{
+		for (int i = 0; i < attribute_loc.size(); i++)
+		{
+			//åªæ‰“å°é€‰æ‹©çš„å­—æ®µ
+			auto val = tuple->begin() + attribute_loc[i];
+			cout << "| " << setw(10) << (*val);
+		}
+		cout << "|" << endl;
+		cout << sline << endl;
+	}
+
+	//æ‰“å°B+æ ‘
+	if (tb->GetIndexNum() != 0)
+	{
+		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
+		tree.Print();
+	}
+}*/
+//JoinæŸ¥è¯¢å®ç°
+void RecordManager::JoinSelect(SQLJoinSelect & st)
+{
+	int table_count = st.get_table_names().size();
+	//æ‹¿åˆ°é€‰æ‹©çš„å±æ€§å
+	vector<string> selected_attributes = st.get_selected_info();
+
+	//ç”±äºSQLStatementç±»ä¸­Parseå‡½æ•°ä»¥åŠåˆ¤æ–­è¿‡è¡¨ååˆæ³•ï¼Œæ‰€æœ‰è¿™é‡Œåªéœ€åˆ¤æ–­å±æ€§æ˜¯å¦åˆæ³•
+	for (int i = 0; i < selected_attributes.size(); i++)
+	{
+		int Pos = selected_attributes[i].find('.');
+		string tbName = selected_attributes[i].substr(0, Pos);
+		string attrName = selected_attributes[i].substr(Pos + 1, selected_attributes[i].length() - Pos - 1);
+		Table *tb_ = catalog_m_->GetDB(db_name_)->GetTable(tbName);
+		vector<Attribute> cur_attr = tb_->GetAttributes();
+		bool isValidAtrr = false;
+		for (int j = 0; j < cur_attr.size(); j++)
+		{
+			if (cur_attr[j].get_attr_name() == attrName)
+			{
+				isValidAtrr = true;
+				break;
+			}
+		}
+		if (!isValidAtrr)
+			throw AttributeNotExistException();
+	}
+
+	//æ–°è¡¨çš„å­—æ®µåé›†åˆ
+	vector<string> attribute_names;
+	//æ–°è¡¨çš„å­—æ®µç±»å‹é›†åˆ
+	vector<string> attr_types;
+
+	//éå†æ‰€æœ‰è¡¨ä¸­è¡¨çš„å±æ€§ï¼Œä»è€Œåˆ›å»ºä¸€å¼ å¤§è¡¨
+	for (int i = 0; i < table_count; i++)
+	{
+		Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_table_names()[i]);
+		vector<Attribute> atts = tb->GetAttributes();
+		for (auto it = atts.begin(); it != atts.end(); it++)
+		{
+			attribute_names.push_back(tb->get_tb_name()+"."+it->get_attr_name());
+			if (it->get_data_type() == 0)
+				attr_types.push_back("int");
+			else if (it->get_data_type() == 1)
+				attr_types.push_back("float");
+			else//char or varchar
+			{
+				attr_types.push_back("varchar(" + intToString(it->get_length()) + ")");
+			}
+		}
+	}
+	string table_name_afer_join = "JOINED_TABLE";
+	QueryParser query_parser;
+
+	string create_new_table_sql_ = "create table JOINED_TABLE(";
+	int k;
+	for ( k = 0; k <( attribute_names.size()-1 ); k++)
+	{
+		create_new_table_sql_ += attribute_names[k] + " " + attr_types[k]+",";
+	}
+	create_new_table_sql_ += attribute_names[k] + " " + attr_types[k] + ");";
+	query_parser.ExecuteSQL("use " + db_name_ + ";");
+	//åˆ›å»ºä¸€å¼ æ–°è¡¨
+	query_parser.ExecuteSQL(create_new_table_sql_);
+
+	//catalog_m_->WriteArchiveFile();æ­¤å¥åˆ‡ä¸å¯åŠ ï¼å› ä¸ºä¸Šä¸€å¥å·²ç»æ›´æ–°äº†catalog.ç°åœ¨å†™çš„è¯ä¼šè¦†ç›–æ›´æ–°çš„å†…å®¹ï¼
+	catalog_m_->ReadArchiveFile();//åªéœ€æŠŠæ›´æ–°åçš„ç›®å½•è¯»å‡ºæ¥å³å¯
+	//æ¥ä¸‹æ¥æ’å…¥æ•°æ®åˆ°æ–°è¡¨ä¸­ï¼Œä¹‹åå¯¹æ–°è¡¨æ‰§è¡Œselectï¼Œæ‰€ä»¥è¦åšåˆ°å±æ€§A=å±æ€§B,to be continued...
+
+}
+void RecordManager::Delete(SQLDelete& st)
+{
+	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
+	bool has_index = false;
+	int index_idx;
+	int where_idx;
+
+	//çœ‹æ˜¯å¦æœ‰index
+	if (tb->GetIndexNum() != 0)
+	{
+		for (auto i = 0; i < tb->GetIndexNum(); i++)
+		{
+			Index *idx = tb->GetIndex(i);
+			for (auto j = 0; j < st.GetWheres().size(); j++)
+			{
+				if (idx->get_attr_name() == st.GetWheres()[j].key_1 && st.GetWheres()[j].op_type == SIGN_EQ)
+				{
+					has_index = true;
+					index_idx = i;
+					where_idx = j;
+				}
+			}
+		}
+	}
+	//å¦‚æœindexä¸æ˜¯ä½œç”¨äºåˆ é™¤åˆ—ï¼Œåˆ™éå†å—
 	if (!has_index)
 	{
 		int block_num = tb->get_first_block_num();
@@ -431,7 +646,7 @@ void RecordManager::Delete(SQLDelete& st)
 				}
 				if (sats)
 				{
-					//É¾³ı¸Ã¼ÇÂ¼
+					//åˆ é™¤è¯¥è®°å½•
 					DeleteRecord(tb, block_num, j);
 					if (tb->GetIndexNum() != 0)
 					{
@@ -449,12 +664,12 @@ void RecordManager::Delete(SQLDelete& st)
 			block_num = bp->GetNextBlockNum();
 		}
 	}
-	//Èç¹ûindexÊÇ×÷ÓÃÓÚÉ¾³ıÁĞ
+	//å¦‚æœindexæ˜¯ä½œç”¨äºåˆ é™¤åˆ—
 	else
 	{
 		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
 
-		//Îªsearch´´½¨tkey
+		//ä¸ºsearchåˆ›å»ºtkey
 		int type = tb->GetIndex(index_idx)->get_key_type();
 		int length = tb->GetIndex(index_idx)->get_key_len();
 		string value = st.GetWheres()[where_idx].value;
@@ -479,14 +694,14 @@ void RecordManager::Delete(SQLDelete& st)
 			}
 			if (sats)
 			{
-				//½«¸Ã¼ÇÂ¼É¾³ı
+				//å°†è¯¥è®°å½•åˆ é™¤
 				DeleteRecord(tb, blocknum, blockoffset);
 				tree.Remove(dest_key);
 			}
 		}
 	}
 	buffer_m_->WriteToDisk();
-	cout << "É¾³ı³É¹¦£¡" << endl;
+	cout << "åˆ é™¤æˆåŠŸï¼" << endl;
 }
 
 void RecordManager::Update(SQLUpdate& st)
@@ -498,7 +713,7 @@ void RecordManager::Update(SQLUpdate& st)
 	int primary_key_index = -1;
 	int affect_index = -1;
 
-	//ÕÒÖ÷¼ü
+	//æ‰¾ä¸»é”®
 	for (int i = 0; i < tb->GetAttributes().size(); ++i)
 	{
 		if (tb->GetAttributes()[i].get_attr_type() == 1)
@@ -588,16 +803,16 @@ void RecordManager::Update(SQLUpdate& st)
 		block_num = bp->GetNextBlockNum();
 	}
 	buffer_m_->WriteToDisk();
-	cout << "¸üĞÂ³É¹¦£¡" << endl;
+	cout << "æ›´æ–°æˆåŠŸï¼" << endl;
 }
-//¸ù¾İ±íµÄ¿éºÅÄÃµ½¿éĞÅÏ¢
+//æ ¹æ®è¡¨çš„å—å·æ‹¿åˆ°å—ä¿¡æ¯
 BlockInfo* RecordManager::GetBlockInfo(Table* tbl, int block_num)
 {
 	if (block_num == -1) return NULL;
 	BlockInfo* block = buffer_m_->GetFileBlock(db_name_, tbl->get_tb_name(), 0, block_num);
 	return block;
 }
-//·µ»Øtb1µÄµÚblock_num¿éÀïµÄµÚoffset¸ötuple
+//è¿”å›tb1çš„ç¬¬block_numå—é‡Œçš„ç¬¬offsetä¸ªtuple
 vector<TKey> RecordManager::GetRecord(Table* tbl, int block_num, int offset)
 {
 	vector<TKey> keys;
@@ -608,9 +823,9 @@ vector<TKey> RecordManager::GetRecord(Table* tbl, int block_num, int offset)
 	{
 		int value_type = tbl->GetAttributes()[i].get_data_type();
 		int length = tbl->GetAttributes()[i].get_length();
-		//Ò»¸öÊôĞÔÖµ£¬Êı¾İÀàĞÍºÍÊôĞÔ³¤¶È
+		//ä¸€ä¸ªå±æ€§å€¼ï¼Œæ•°æ®ç±»å‹å’Œå±æ€§é•¿åº¦
 		TKey tmp(value_type, length);
-		//½«contentÖ¸ÕëºóµÄlength¸ö×Ö½Ú¸´ÖÆ¸øtmpµÄkey
+		//å°†contentæŒ‡é’ˆåçš„lengthä¸ªå­—èŠ‚å¤åˆ¶ç»™tmpçš„key
 		memcpy(tmp.get_key(), content, length);
 		//cout << "RecordManager::GetRecord::memcpy :" << content << " to " << tmp.get_key() << endl;
 		keys.push_back(tmp);
@@ -618,49 +833,49 @@ vector<TKey> RecordManager::GetRecord(Table* tbl, int block_num, int offset)
 	}
 	return keys;
 }
-//É¾³ıtb1µÄblock_num¿éµÄµÚoffset¸ötuple
+//åˆ é™¤tb1çš„block_numå—çš„ç¬¬offsetä¸ªtuple
 void RecordManager::DeleteRecord(Table* tbl, int block_num, int offset)
 {
 	BlockInfo *bp = GetBlockInfo(tbl, block_num);
 	char *content = bp->get_data() + offset * tbl->get_record_length() + 12;
 	char *replace = bp->get_data() + (bp->GetRecordCount() - 1) * (tbl->get_record_length()) + 12;
-	//°Ñ´ıÉ¾¼ÇÂ¼¸´ÖÆµ½¸Ã¿éµÄÎ²²¿
+	//æŠŠå¾…åˆ è®°å½•å¤åˆ¶åˆ°è¯¥å—çš„å°¾éƒ¨
 	memcpy(content, replace, tbl->get_record_length());
-	//¼ÇÂ¼ÊıÁ¿¼õÒ»
+	//è®°å½•æ•°é‡å‡ä¸€
 	bp->DecreaseRecordCount();
-	//Èç¹ûÉ¾³ıºó£¬¸Ã¿é¼ÇÂ¼Îª0£¬Ôò°ÑËü¼Óµ½À¬»ø¿éµÄÁ´±íÀï
+	//å¦‚æœåˆ é™¤åï¼Œè¯¥å—è®°å½•ä¸º0ï¼Œåˆ™æŠŠå®ƒåŠ åˆ°åƒåœ¾å—çš„é“¾è¡¨é‡Œ
 	if (bp->GetRecordCount() == 0)
 	{
 		int prevnum = bp->GetPrevBlockNum();
 		int nextnum = bp->GetNextBlockNum();
 		if (prevnum != -1)
-		{//Ôò½«Ç°Ò»¿éµÄnextÖÃÎªµ±Ç°¿éµÄnext
+		{//åˆ™å°†å‰ä¸€å—çš„nextç½®ä¸ºå½“å‰å—çš„next
 			BlockInfo *pbp = GetBlockInfo(tbl, prevnum);
 			pbp->SetNextBlockNum(nextnum);
 			buffer_m_->WriteBlock(pbp);
 		}
 		if (nextnum != -1)
-		{//Ôò½«ÏÂÒ»¿éµÄpreviousÖÃÎªµ±Ç°¿éµÄprevious
+		{//åˆ™å°†ä¸‹ä¸€å—çš„previousç½®ä¸ºå½“å‰å—çš„previous
 			BlockInfo *nbp = GetBlockInfo(tbl, nextnum);
 			nbp->SetPrevBlockNum(prevnum);
-			//½«bpÖÃÎªdirty£¬±»ĞŞ¸Ä¹ı
+			//å°†bpç½®ä¸ºdirtyï¼Œè¢«ä¿®æ”¹è¿‡
 			buffer_m_->WriteBlock(nbp);
 		}
-		//ÄÃµ½±íÖĞ¿ÉÓÃ¿éµÄµÚÒ»¸öÖ¸Õë
+		//æ‹¿åˆ°è¡¨ä¸­å¯ç”¨å—çš„ç¬¬ä¸€ä¸ªæŒ‡é’ˆ
 		BlockInfo *firstrubbish = GetBlockInfo(tbl, tbl->get_first_block_num());
 
 		bp->SetNextBlockNum(-1);
 		bp->SetPrevBlockNum(-1);
 		if (firstrubbish != NULL)
 		{
-			//½«Õâ¸öÀ¬»ø¿é·Åµ½firstrubbishÖ®Ç°£¬Ò²¾ÍÊÇ°ÑÕâ¸ö¿Õ³öÀ´µÄ¿é¹ÒÔÚ¿ÉÓÃ¿éµÄ¶ÓÊ×µÄÇ°Ãæ
+			//å°†è¿™ä¸ªåƒåœ¾å—æ”¾åˆ°firstrubbishä¹‹å‰ï¼Œä¹Ÿå°±æ˜¯æŠŠè¿™ä¸ªç©ºå‡ºæ¥çš„å—æŒ‚åœ¨å¯ç”¨å—çš„é˜Ÿé¦–çš„å‰é¢
 			firstrubbish->SetPrevBlockNum(block_num);
 			bp->SetNextBlockNum(firstrubbish->get_block_num());
 		}
-		//°ÑÕâ¸öĞÂµÄÀ¬»ø¿éÖÃÎªÀ¬»ø¿é¶ÓÊ×
+		//æŠŠè¿™ä¸ªæ–°çš„åƒåœ¾å—ç½®ä¸ºåƒåœ¾å—é˜Ÿé¦–
 		tbl->set_first_rubbish_num(block_num);
 	}
-	//½«bpÖÃÎªdirty£¬±»ĞŞ¸Ä¹ı
+	//å°†bpç½®ä¸ºdirtyï¼Œè¢«ä¿®æ”¹è¿‡
 	buffer_m_->WriteBlock(bp);
 }
 
@@ -684,7 +899,7 @@ bool RecordManager::SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where)
 	int idx = -1;
 	for (int i = 0; i < tbl->GetAttributeNum(); ++i)
 	{
-		if (tbl->GetAttributes()[i].get_attr_name() == where.key)
+		if (tbl->GetAttributes()[i].get_attr_name() == where.key_1)
 			idx = i;
 	}
 
@@ -717,10 +932,10 @@ bool RecordManager::SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where)
 	}
 }
 
-/**********************                  ¾Û¼¯º¯ÊıÊµÏÖ                      ********************************/
-/*ÓÉÓÚtupleÖĞ²¢Ã»ÓĞ±íÍ·ĞÅÏ¢£¬ËùÒÔsql½âÎö¾Û¼¯ÔËËãÊ±£¬Ğè½âÎö¾Û¼¯¶ÔÏóÊÇ±íµÄµÚ¼¸ÁĞ£ºindex*/
+/**********************                  èšé›†å‡½æ•°å®ç°                      ********************************/
+/*ç”±äºtupleä¸­å¹¶æ²¡æœ‰è¡¨å¤´ä¿¡æ¯ï¼Œæ‰€ä»¥sqlè§£æèšé›†è¿ç®—æ—¶ï¼Œéœ€è§£æèšé›†å¯¹è±¡æ˜¯è¡¨çš„ç¬¬å‡ åˆ—ï¼šindex*/
 TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex) {
-	TKey * temp = nullptr;//·µ»ØÖµ
+	TKey * temp = nullptr;//è¿”å›å€¼
 	int j = 0;
 	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++, j++)
 	{
@@ -742,7 +957,7 @@ TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex) {
 }
 
 TKey RecordManager::Max(vector<vector<TKey> > tuples, int MaxIndex) {
-	TKey * temp = nullptr;//·µ»ØÖµ
+	TKey * temp = nullptr;//è¿”å›å€¼
 	int j = 0;
 	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++, j++)
 	{
@@ -763,13 +978,13 @@ TKey RecordManager::Max(vector<vector<TKey> > tuples, int MaxIndex) {
 	return (*temp);
 }
 
-//ÓÉÓÚÃ»ÓĞGroup By ËùÒÔ¶ÔÊôĞÔµÄcountÖ±½ÓµÈ¼ÛÓÚtupleµÄcount¡£IndexÔİÊ±Ã»ÓÃ
-int RecordManager::Count(vector<vector<TKey> > tuples, int Index) {
+//ç”±äºæ²¡æœ‰Group By æ‰€ä»¥å¯¹å±æ€§çš„countç›´æ¥ç­‰ä»·äºtupleçš„countã€‚Indexæš‚æ—¶æ²¡ç”¨
+int RecordManager::Count(vector<TKey> tuples, int Index) {
 	return tuples.size();
 }
 
 TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex) {
-	TKey * temp = nullptr;//·µ»ØÖµ
+	TKey * temp = nullptr;//è¿”å›å€¼
 	int j = 0;
 	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++, j++)
 	{
@@ -783,11 +998,12 @@ TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex) {
 					temp = new TKey(*(val));
 				}
 				else
-					(*temp) += (*val);
+				{//æ“ä½œç¬¦é‡è½½(*temp) += (*val);
+				}
 			}
 		}
 	}
 	if (temp != nullptr)
-		(*temp) /= j;
+		//æ“ä½œç¬¦é‡è½½(*temp) /= j;
 	return (temp);
 }
