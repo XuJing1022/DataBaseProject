@@ -3,33 +3,33 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 //
-#pragma region class ÊµÏÖ£ºCatalogManager
-/*CatalogManager¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šCatalogManager
+/*CatalogManageræ„é€ å‡½æ•°*/
 CatalogManager::CatalogManager(string path)
 {
 	path_ = path;
 	ReadArchiveFile();
 }
 
-/*CatalogManagerÎö¹¹º¯Êı*/
+/*CatalogManagerææ„å‡½æ•°*/
 CatalogManager::~CatalogManager(void)
 {
 	WriteArchiveFile();
 }
 
-/*»ñÈ¡±äÁ¿path_*/
+/*è·å–å˜é‡path_*/
 string CatalogManager::get_path()
 {
 	return path_;
 }
 
-/*»ñÈ¡±äÁ¿databases_*/
+/*è·å–å˜é‡databases_*/
 vector<Database>& CatalogManager::GetDBs()
 {
 	return databases_;
 }
 
-/*¸ù¾İdatabaseÃû»ñÈ¡¶ÔÓ¦DatabaseÀà*/
+/*æ ¹æ®databaseåè·å–å¯¹åº”Databaseç±»*/
 Database* CatalogManager::GetDB(string database_name)
 {
 	for (auto database = databases_.begin(); database != databases_.end(); database++)
@@ -38,40 +38,40 @@ Database* CatalogManager::GetDB(string database_name)
 	return NULL;
 }
 
-/*¶ÁÈ¡Ä¿Â¼ÎÄµµ*/
+/*è¯»å–ç›®å½•æ–‡æ¡£*/
 void CatalogManager::ReadArchiveFile()
 {
 	string file_name = path_ + "catalog";
-	boost::filesystem::path file_path(file_name);/*»ñÈ¡Ä¿Â¼ÎÄµµµØÖ·*/
+	boost::filesystem::path file_path(file_name);/*è·å–ç›®å½•æ–‡æ¡£åœ°å€*/
 
-	if (boost::filesystem::exists(file_path))/*ÅĞ¶ÏÄ¿Â¼ÎÄµµµØÖ·ÊÇ·ñ´æÔÚ*/
+	if (boost::filesystem::exists(file_path))/*åˆ¤æ–­ç›®å½•æ–‡æ¡£åœ°å€æ˜¯å¦å­˜åœ¨*/
 	{
-		ifstream my_ifs;/*´´½¨¶ÁÈ¡Á÷*/
-		my_ifs.open(file_name.c_str(), ios::binary); /*´ò¿ª¶ÁÈ¡ÎÄ¼ş*/
-		boost::archive::binary_iarchive iar(my_ifs); /*¶ş½øÖÆÎÄ¼şÊäÈë¹éµµÀà*/
-		iar >> (*this);    /*»Ö¸´¸Ã¶ÔÏó*/
-		my_ifs.close();/*¹Ø±Õ¶ÁÈ¡Á÷*/
+		ifstream my_ifs;/*åˆ›å»ºè¯»å–æµ*/
+		my_ifs.open(file_name.c_str(), ios::binary); /*æ‰“å¼€è¯»å–æ–‡ä»¶*/
+		boost::archive::binary_iarchive iar(my_ifs); /*äºŒè¿›åˆ¶æ–‡ä»¶è¾“å…¥å½’æ¡£ç±»*/
+		iar >> (*this);    /*æ¢å¤è¯¥å¯¹è±¡*/
+		my_ifs.close();/*å…³é—­è¯»å–æµ*/
 	}
 }
 
-/*Ğ´ÈëÄ¿Â¼ÎÄµµ*/
+/*å†™å…¥ç›®å½•æ–‡æ¡£*/
 void CatalogManager::WriteArchiveFile()
 {
 	string file_name = path_ + "catalog";
 	ofstream my_ofs;
-	my_ofs.open(file_name.c_str(), ios::binary);/*´ò¿ªÊäÈëÎÄ¼ş*/
-	boost::archive::binary_oarchive oar(my_ofs);/*¶ş½øÖÆÎÄ¼şÊä³ö¹éµµÀà*/
-	oar << (*this);/*±£´æ±¾¶ÔÏó*/
-	my_ofs.close();/*¹Ø±ÕÊäÈëÁ÷*/
+	my_ofs.open(file_name.c_str(), ios::binary);/*æ‰“å¼€è¾“å…¥æ–‡ä»¶*/
+	boost::archive::binary_oarchive oar(my_ofs);/*äºŒè¿›åˆ¶æ–‡ä»¶è¾“å‡ºå½’æ¡£ç±»*/
+	oar << (*this);/*ä¿å­˜æœ¬å¯¹è±¡*/
+	my_ofs.close();/*å…³é—­è¾“å…¥æµ*/
 }
 
-/*´´½¨Êı¾İ¿â£¬ÍùË½ÓĞ±äÁ¿database_ÖĞÌí¼ÓÒ»¸öĞÂ½¨µÄdatabaseÀà*/
+/*åˆ›å»ºæ•°æ®åº“ï¼Œå¾€ç§æœ‰å˜é‡database_ä¸­æ·»åŠ ä¸€ä¸ªæ–°å»ºçš„databaseç±»*/
 void CatalogManager::CreateDatabase(string database_name)
 {
 	databases_.push_back(Database(database_name));
 }
 
-/*É¾³ıÊı¾İ¿â£¬ÔÚË½ÓĞ±äÁ¿database_ÖĞÕÒµ½¸Ãdatabase£¬²¢É¾³ı*/
+/*åˆ é™¤æ•°æ®åº“ï¼Œåœ¨ç§æœ‰å˜é‡database_ä¸­æ‰¾åˆ°è¯¥databaseï¼Œå¹¶åˆ é™¤*/
 void CatalogManager::DeleteDatabase(string database_name)
 {
 	for (auto database = 0; database < databases_.size(); database++)
@@ -81,39 +81,39 @@ void CatalogManager::DeleteDatabase(string database_name)
 
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºDatabase
+#pragma region class å®ç°ï¼šDatabase
 
-/*Database²»´ø²ÎÊı¹¹Ôìº¯Êı*/
+/*Databaseä¸å¸¦å‚æ•°æ„é€ å‡½æ•°*/
 Database::Database()
 {
 	;
 }
 
-/*Database´ø²ÎÊı¹¹Ôìº¯Êı*/
+/*Databaseå¸¦å‚æ•°æ„é€ å‡½æ•°*/
 Database::Database(string database_name)
 {
 	database_name_ = database_name;
 }
 
-/*DatabaseÎö¹¹º¯Êı*/
+/*Databaseææ„å‡½æ•°*/
 Database::~Database()
 {
 
 }
 
-/*»ñÈ¡±äÁ¿database_name_*/
+/*è·å–å˜é‡database_name_*/
 string Database::get_database_name()
 {
 	return database_name_;
 }
 
-/*»ñÈ¡±äÁ¿tables_*/
-vector<Table>& Database::get_tables()
+/*è·å–å˜é‡tables_*/
+vector<Table>& Database::get_tables() 
 {
-	return tables_;
+	return tables_; 
 }
 
-/*¸ù¾İtableÃû»ñÈ¡¶ÔÓ¦µÄTableÀà*/
+/*æ ¹æ®tableåè·å–å¯¹åº”çš„Tableç±»*/
 Table* Database::GetTable(string table_name)
 {
 	for (auto table = tables_.begin(); table != tables_.end(); table++)
@@ -124,28 +124,28 @@ Table* Database::GetTable(string table_name)
 	return NULL;
 }
 
-/*¸ù¾İSQLCreateTable¶ÔÏó´´½¨Ò»¸ötable*/
+/*æ ¹æ®SQLCreateTableå¯¹è±¡åˆ›å»ºä¸€ä¸ªtable*/
 void Database::CreateTable(SQLCreateTable& sql_obj)
 {
 	int record_length = 0;
 	Table table;
-	vector<Attribute> attributes = sql_obj.get_attributes();/*»ñÈ¡attributes±äÁ¿*/
-	for (auto attribute = attributes.begin(); attribute != attributes.end(); attribute++)/*¸³Öµattributes_*/
+	vector<Attribute> attributes = sql_obj.get_attributes();/*è·å–attributeså˜é‡*/
+	for (auto attribute = attributes.begin(); attribute != attributes.end(); attribute++)/*èµ‹å€¼attributes_*/
 	{
 		table.AddAttribute((*attribute));
-		record_length = record_length + (*attribute).get_length();
+		record_length = record_length+(*attribute).get_length();
 	}
-	table.set_table_name(sql_obj.get_table_name());/*¸³Öµtable_name_*/
-	table.set_record_length(record_length);/*¸³Öµrecord_length_*/
-	tables_.push_back(table);/*½«¸Ãtable²åÈëµ½tableÁĞ±íÖĞ*/
+	table.set_table_name(sql_obj.get_table_name());/*èµ‹å€¼table_name_*/
+	table.set_record_length(record_length);/*èµ‹å€¼record_length_*/
+	tables_.push_back(table);/*å°†è¯¥tableæ’å…¥åˆ°tableåˆ—è¡¨ä¸­*/
 }
 
-/*¸ù¾İSQLDropTable¶ÔÏóÉ¾³ıÒ»ÕÅtable*/
+/*æ ¹æ®SQLDropTableå¯¹è±¡åˆ é™¤ä¸€å¼ table*/
 void Database::DropTable(SQLDropTable& sql_obj)
 {
-	for (auto table = tables_.begin(); table != tables_.end(); table++)/*±éÀú¸ÃÊı¾İ¿âËùÓĞ±í*/
+	for (auto table = tables_.begin(); table != tables_.end(); table++)/*éå†è¯¥æ•°æ®åº“æ‰€æœ‰è¡¨*/
 	{
-		if (table->get_tb_name() == sql_obj.get_table_name())/*»ñÈ¡¸Ã±íµÄ±íÃûÅĞ¶ÏÊÇ·ñµÈÓÚÒª²éÑ¯µÄ±íÃû*/
+		if (table->get_tb_name() == sql_obj.get_table_name())/*è·å–è¯¥è¡¨çš„è¡¨ååˆ¤æ–­æ˜¯å¦ç­‰äºè¦æŸ¥è¯¢çš„è¡¨å*/
 		{
 			tables_.erase(table);
 			return;
@@ -153,14 +153,14 @@ void Database::DropTable(SQLDropTable& sql_obj)
 	}
 }
 
-/*¸ù¾İSQLDropIndex¶ÔÏó´´½¨Ò»¸öindex*/
+/*æ ¹æ®SQLDropIndexå¯¹è±¡åˆ›å»ºä¸€ä¸ªindex*/
 void Database::DropIndex(SQLDropIndex& sql_obj)
 {
-	for (auto table = tables_.begin(); table != tables_.end(); table++)/*±éÀú¸ÃÊı¾İ¿âËùÓĞ±í*/
+	for (auto table = tables_.begin(); table != tables_.end(); table++)/*éå†è¯¥æ•°æ®åº“æ‰€æœ‰è¡¨*/
 	{
-		for (auto index = table->get_indexs().begin(); index != table->get_indexs().end(); index++)/*±éÀú¸Ã±íËùÓĞË÷Òı*/
+		for (auto index = table->get_indexs().begin(); index != table->get_indexs().end(); index++)/*éå†è¯¥è¡¨æ‰€æœ‰ç´¢å¼•*/
 		{
-			if (index->get_name() == sql_obj.get_index_name())/*»ñÈ¡¸ÃË÷ÒıÃû£¬ÅĞ¶ÏÊÇ·ñµÈÓÚÒª²éÑ¯µÄË÷ÒıÃû*/
+			if (index->get_name() == sql_obj.get_index_name())/*è·å–è¯¥ç´¢å¼•åï¼Œåˆ¤æ–­æ˜¯å¦ç­‰äºè¦æŸ¥è¯¢çš„ç´¢å¼•å*/
 			{
 				table->get_indexs().erase(index);
 				return;
@@ -169,14 +169,14 @@ void Database::DropIndex(SQLDropIndex& sql_obj)
 	}
 }
 
-/*¸ù¾İË÷ÒıÃûÅĞ¶Ï¸ÃË÷ÒıÊÇ·ñ´æÔÚ*/
+/*æ ¹æ®ç´¢å¼•ååˆ¤æ–­è¯¥ç´¢å¼•æ˜¯å¦å­˜åœ¨*/
 bool Database::CheckIfIndexExists(string index_name)
 {
-	for (auto table = tables_.begin(); table != tables_.end(); table++)/*±éÀú¸ÃÊı¾İ¿âËùÓĞ±í*/
+	for (auto table = tables_.begin(); table != tables_.end(); table++)/*éå†è¯¥æ•°æ®åº“æ‰€æœ‰è¡¨*/
 	{
-		for (auto index = table->get_indexs().begin(); index != table->get_indexs().end(); index++)/*±éÀú¸Ã±íËùÓĞË÷Òı*/
+		for (auto index = table->get_indexs().begin(); index != table->get_indexs().end(); index++)/*éå†è¯¥è¡¨æ‰€æœ‰ç´¢å¼•*/
 		{
-			if (index->get_name() == index_name)/*»ñÈ¡¸ÃË÷ÒıÃû£¬ÅĞ¶ÏÊÇ·ñµÈÓÚÒª²éÑ¯µÄË÷ÒıÃû*/
+			if (index->get_name() == index_name)/*è·å–è¯¥ç´¢å¼•åï¼Œåˆ¤æ–­æ˜¯å¦ç­‰äºè¦æŸ¥è¯¢çš„ç´¢å¼•å*/
 			{
 				return true;
 			}
@@ -187,8 +187,8 @@ bool Database::CheckIfIndexExists(string index_name)
 
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºTable
-/*TableµÄ¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šTable
+/*Tableçš„æ„é€ å‡½æ•°*/
 Table::Table()
 {
 	table_name_ = "";
@@ -198,42 +198,42 @@ Table::Table()
 	block_count_ = 0;
 }
 
-/*TableµÄÎö¹¹º¯Êı*/
-Table::~Table()
+/*Tableçš„ææ„å‡½æ•°*/
+Table::~Table() 
 {
 }
 
-/*»ñÈ¡±äÁ¿table_name_*/
-string Table::get_tb_name()
+/*è·å–å˜é‡table_name_*/
+string Table::get_tb_name() 
 {
-	return table_name_;
+	return table_name_; 
 }
 
-/*ÉèÖÃ±äÁ¿table_name_*/
-void Table::set_table_name(string table_name)
+/*è®¾ç½®å˜é‡table_name_*/
+void Table::set_table_name(string table_name) 
 {
 	table_name_ = table_name;
 }
 
-/*»ñÈ¡±äÁ¿record_length_*/
-int Table::get_record_length()
+/*è·å–å˜é‡record_length_*/
+int Table::get_record_length() 
 {
 	return record_length_;
 }
 
-/*ÉèÖÃ±äÁ¿record_length_*/
-void Table::set_record_length(int len)
+/*è®¾ç½®å˜é‡record_length_*/
+void Table::set_record_length(int len) 
 {
 	record_length_ = len;
 }
 
-/*»ñÈ¡±äÁ¿attributes*/
-vector<Attribute>& Table::GetAttributes()
-{
+/*è·å–å˜é‡attributes*/
+vector<Attribute>& Table::GetAttributes() 
+{ 
 	return attributes_;
 }
 
-/*¸ù¾İ×Ö¶ÎÃû»ñÈ¡attribute¶ÔÏó*/
+/*æ ¹æ®å­—æ®µåè·å–attributeå¯¹è±¡*/
 Attribute* Table::GetAttribute(string name)
 {
 	for (auto attr = attributes_.begin(); attr != attributes_.end(); attr++)
@@ -244,7 +244,7 @@ Attribute* Table::GetAttribute(string name)
 	return NULL;
 }
 
-/*¸ù¾İ×Ö¶ÎÃû»ñÈ¡attribute¶ÔÏóµÄÎ»ÖÃ*/
+/*æ ¹æ®å­—æ®µåè·å–attributeå¯¹è±¡çš„ä½ç½®*/
 int Table::GetAttributeIndex(string name)
 {
 	for (unsigned int i = 0; i < attributes_.size(); i++)
@@ -255,81 +255,81 @@ int Table::GetAttributeIndex(string name)
 	return -1;
 }
 
-/*»ñÈ¡±äÁ¿first_block_num*/
+/*è·å–å˜é‡first_block_num*/
 int Table::get_first_block_num()
 {
 	return first_block_num_;
 }
 
-/*ÉèÖÃ±äÁ¿first_block_num*/
+/*è®¾ç½®å˜é‡first_block_num*/
 void Table::set_first_block_num(int num)
-{
-	first_block_num_ = num;
+{ 
+	first_block_num_ = num; 
 }
 
-/*»ñÈ¡±äÁ¿first_rubbish_num_*/
-int Table::get_first_rubbish_num()
-{
-	return first_rubbish_num_;
+/*è·å–å˜é‡first_rubbish_num_*/
+int Table::get_first_rubbish_num() 
+{ 
+	return first_rubbish_num_; 
 }
 
-/*ÉèÖÃ±äÁ¿first_rubbish_num_*/
-void Table::set_first_rubbish_num(int num)
+/*è®¾ç½®å˜é‡first_rubbish_num_*/
+void Table::set_first_rubbish_num(int num) 
 {
 	first_rubbish_num_ = num;
 }
 
-/*»ñÈ¡±äÁ¿block_count_*/
-int Table::get_block_count()
+/*è·å–å˜é‡block_count_*/
+int Table::get_block_count() 
 {
 	return block_count_;
 }
 
-/*»ñÈ¡×Ö¶ÎÊıÁ¿*/
-unsigned long Table::GetAttributeNum()
-{
+/*è·å–å­—æ®µæ•°é‡*/
+unsigned long Table::GetAttributeNum() 
+{ 
 	return attributes_.size();
 }
 
-/*´«ÈëAttribute¶ÔÏó£¬½«¸Ã¶ÔÏó²åÈëTable¶ÔÏóÖĞ*/
-void Table::AddAttribute(Attribute& attr)
+/*ä¼ å…¥Attributeå¯¹è±¡ï¼Œå°†è¯¥å¯¹è±¡æ’å…¥Tableå¯¹è±¡ä¸­*/
+void Table::AddAttribute(Attribute& attr) 
 {
-	attributes_.push_back(attr);
+	attributes_.push_back(attr); 
 }
 
 /*block_count++*/
-void Table::IncreaseBlockCount()
-{
-	block_count_++;
+void Table::IncreaseBlockCount() 
+{ 
+	block_count_++; 
 }
 
-/*»ñÈ¡±äÁ¿indexs*/
+/*è·å–å˜é‡indexs*/
 vector<Index>& Table::get_indexs()
-{
+{ 
 	return indexs_;
 }
 
-/*¸ù¾İindexÎ»ÖÃ»ñÈ¡¶ÔÓ¦µÄIndex¶ÔÏó*/
-Index* Table::GetIndex(int num)
+/*æ ¹æ®indexä½ç½®è·å–å¯¹åº”çš„Indexå¯¹è±¡*/
+Index* Table::GetIndex(int num) 
 {
 	return &(indexs_[num]);
 }
 
-/*»ñÈ¡IndexÊıÁ¿*/
+/*è·å–Indexæ•°é‡*/
 unsigned long Table::GetIndexNum()
-{
-	return indexs_.size();
+{ 
+	return indexs_.size(); 
 }
 
-/*´«ÈëIndex¶ÔÏó£¬½«¸Ã¶ÔÏó²åÈë¸ÃTable¶ÔÏóÖĞ*/
-void Table::AddIndex(Index& idx)
-{
-	indexs_.push_back(idx);
+/*ä¼ å…¥Indexå¯¹è±¡ï¼Œå°†è¯¥å¯¹è±¡æ’å…¥è¯¥Tableå¯¹è±¡ä¸­*/
+void Table::AddIndex(Index& idx) 
+{ 
+	indexs_.push_back(idx); 
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºAttribute
-/*Attribute¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šAttribute
+/*Attributeæ„é€ å‡½æ•°*/
 Attribute::Attribute()
 {
 	attribute_name_ = "";
@@ -338,69 +338,69 @@ Attribute::Attribute()
 	attribute_type_ = 0;
 }
 
-/*AttributeÎö¹¹º¯Êı*/
+/*Attributeææ„å‡½æ•°*/
 Attribute::~Attribute()
 {
 	;
 }
 
-/*»ñÈ¡±äÁ¿attribute_name_*/
+/*è·å–å˜é‡attribute_name_*/
 string Attribute::get_attr_name()
 {
 	return attribute_name_;
 }
 
-/*ÉèÖÃ±äÁ¿attribute_name_*/
+/*è®¾ç½®å˜é‡attribute_name_*/
 void Attribute::set_attribute_name(string name)
 {
 	attribute_name_ = name;
 }
 
-/*»ñÈ¡±äÁ¿attribute_type_*/
+/*è·å–å˜é‡attribute_type_*/
 int Attribute::get_attr_type()
 {
 	return attribute_type_;
 }
 
-/*ÉèÖÃattribute_type_*/
+/*è®¾ç½®attribute_type_*/
 void Attribute::set_attribute_type(int type)
 {
 	attribute_type_ = type;
 }
 
-/*»ñÈ¡±äÁ¿data_type_*/
+/*è·å–å˜é‡data_type_*/
 int Attribute::get_data_type()
 {
 	return data_type_;
 }
 
-/*ÉèÖÃ±äÁ¿data_type_*/
+/*è®¾ç½®å˜é‡data_type_*/
 void Attribute::set_data_type(int type)
 {
 	data_type_ = type;
 }
 
-/*»ñÈ¡±äÁ¿length_*/
+/*è·å–å˜é‡length_*/
 int Attribute::get_length()
 {
 	return length_;
 }
 
-/*ÉèÖÃ±äÁ¿length_*/
+/*è®¾ç½®å˜é‡length_*/
 void Attribute::set_length(int length)
 {
 	length_ = length;
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºIndex
-/*Index¹¹Ôìº¯Êı*/
-Index::Index()
+#pragma region class å®ç°ï¼šIndex
+/*Indexæ„é€ å‡½æ•°*/
+Index::Index() 
 {
 	;
 }
 
-/*Index´ø²ÎÊı¹¹Ôìº¯Êı*/
+/*Indexå¸¦å‚æ•°æ„é€ å‡½æ•°*/
 Index::Index(std::string name, std::string attr_name, int keytype, int keylen, int rank)
 {
 	attribute_name_ = attr_name;
@@ -416,92 +416,92 @@ Index::Index(std::string name, std::string attr_name, int keytype, int keylen, i
 	max_count_ = 0;
 }
 
-/*»ñÈ¡±äÁ¿attribute_name_*/
+/*è·å–å˜é‡attribute_name_*/
 string Index::get_attr_name()
 {
-	return attribute_name_;
+	return attribute_name_; 
 }
 
-/*»ñÈ¡±äÁ¿name_*/
+/*è·å–å˜é‡name_*/
 string Index::get_name()
 {
 	return name_;
 }
 
-/*»ñÈ¡±äÁ¿key_length_*/
-int Index::get_key_len()
+/*è·å–å˜é‡key_length_*/
+int Index::get_key_len() 
 {
 	return key_length_;
 }
 
-/*»ñÈ¡±äÁ¿key_type_*/
+/*è·å–å˜é‡key_type_*/
 int Index::get_key_type()
 {
 	return key_type_;
 }
 
-/*»ñÈ¡±äÁ¿rank_*/
+/*è·å–å˜é‡rank_*/
 int Index::get_rank()
 {
 	return rank_;
 }
 
-/*»ñÈ¡±äÁ¿root_*/
-int Index::get_root()
+/*è·å–å˜é‡root_*/
+int Index::get_root() 
 {
 	return root_;
 }
 
-/*ÉèÖÃ±äÁ¿root_*/
+/*è®¾ç½®å˜é‡root_*/
 void Index::set_root(int root)
-{
+{ 
 	root_ = root;
 }
 
-/*»ñÈ¡±äÁ¿leaf_head_*/
+/*è·å–å˜é‡leaf_head_*/
 int Index::get_leaf_head()
 {
 	return leaf_head_;
 }
 
-/*ÉèÖÃ±äÁ¿leaf_head_*/
-void Index::set_leaf_head(int leaf_head)
+/*è®¾ç½®å˜é‡leaf_head_*/
+void Index::set_leaf_head(int leaf_head) 
 {
 	leaf_head_ = leaf_head;
 }
 
-/*»ñÈ¡±äÁ¿key_count_*/
+/*è·å–å˜é‡key_count_*/
 int Index::get_key_count()
-{
+{ 
 	return key_count_;
 }
 
-/*ÉèÖÃ±äÁ¿key_count_*/
-void Index::set_key_count(int key_count)
+/*è®¾ç½®å˜é‡key_count_*/
+void Index::set_key_count(int key_count) 
 {
 	key_count_ = key_count;
 }
 
-/*»ñÈ¡±äÁ¿level_*/
-int Index::get_level()
+/*è·å–å˜é‡level_*/
+int Index::get_level() 
 {
 	return level_;
 }
 
-/*ÉèÖÃ±äÁ¿level_*/
+/*è®¾ç½®å˜é‡level_*/
 void Index::set_level(int level)
 {
 	level_ = level;
 }
 
-/*»ñÈ¡±äÁ¿node_count_*/
-int Index::get_node_count()
+/*è·å–å˜é‡node_count_*/
+int Index::get_node_count() 
 {
 	return node_count_;
 }
 
-/*ÉèÖÃ±äÁ¿node_count_*/
-void Index::set_node_count(int node_count)
+/*è®¾ç½®å˜é‡node_count_*/
+void Index::set_node_count(int node_count) 
 {
 	node_count_ = node_count;
 }
@@ -513,9 +513,9 @@ int Index::IncreaseMaxCount()
 }
 
 /*key_count_++*/
-int Index::IncreaseKeyCount()
+int Index::IncreaseKeyCount() 
 {
-	return key_count_++;
+	return key_count_++; 
 }
 
 /*node_count_++*/
@@ -525,19 +525,19 @@ int Index::IncreaseNodeCount()
 }
 
 /*level_++*/
-int Index::IncreaseLevel()
+int Index::IncreaseLevel() 
 {
-	return level_++;
+	return level_++; 
 }
 
 /*key_count_--*/
 int Index::DecreaseKeyCount()
 {
-	return key_count_--;
+	return key_count_--; 
 }
 
 /*node_count_--*/
-int Index::DecreaseNodeCount()
+int Index::DecreaseNodeCount() 
 {
 	return node_count_--;
 }
