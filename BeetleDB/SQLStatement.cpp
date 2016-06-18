@@ -1,4 +1,4 @@
-//Implemented by Jin Xin
+//Implemented by Jin Xinï¼ŒSQLJoinSelect is implemented by Lai ZhengMin
 #include"SQLStatement.h"
 
 #include <iomanip>
@@ -6,50 +6,50 @@
 #include <boost/algorithm/string.hpp>
 using namespace std;
 
-#pragma region class ÊµÏÖ£ºSQL
-/*sql²»´ø²ÎÊıµÄ¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šSQL
+/*sqlä¸å¸¦å‚æ•°çš„æ„é€ å‡½æ•°*/
 SQL::SQL()
 {
 	sql_type_ = -1;
 }
 
-/*sql´ø²ÎÊıint sql_typeµÄ¹¹Ôìº¯Êı*/
+/*sqlå¸¦å‚æ•°int sql_typeçš„æ„é€ å‡½æ•°*/
 SQL::SQL(int sql_type)
 {
 	sql_type_ = sql_type;
 }
 
-/*»ñÈ¡sqlÓï¾äµÄÀàĞÍ*/
+/*è·å–sqlè¯­å¥çš„ç±»å‹*/
 int SQL::get_sql_type()
 {
 	return sql_type_;
 }
 
-/*ÉèÖÃsqlÓï¾äµÄÀàĞÍ*/
+/*è®¾ç½®sqlè¯­å¥çš„ç±»å‹*/
 void SQL::set_sql_type(int sql_type)
 {
 	sql_type_ = sql_type;
 }
 
-/*½âÎöSQLÓï¾äÖĞ×Ö¶ÎµÄÊı¾İÀàĞÍ*/
+/*è§£æSQLè¯­å¥ä¸­å­—æ®µçš„æ•°æ®ç±»å‹*/
 int SQL::ParseDataType(vector<string> sql_vector, Attribute &attr, unsigned int pos)
 {
-	boost::algorithm::to_lower(sql_vector[pos]);/*»ñÈ¡Ğ¡Ğ´±ãÓÚºóĞøÅĞ¶Ï*/
-	if (sql_vector[pos] == "int")/*Èç¹ûÊÇintÀàĞÍ£¬ÉèÖÃattrµÄÊı¾İÀàĞÍÎªT_INT,attr×Ö¶Î³¤¶ÈÎª4*/
+	boost::algorithm::to_lower(sql_vector[pos]);/*è·å–å°å†™ä¾¿äºåç»­åˆ¤æ–­*/
+	if (sql_vector[pos] == "int")/*å¦‚æœæ˜¯intç±»å‹ï¼Œè®¾ç½®attrçš„æ•°æ®ç±»å‹ä¸ºT_INT,attrå­—æ®µé•¿åº¦ä¸º4*/
 	{
 		attr.set_data_type(T_INT);
 		attr.set_length(4);
 		pos++;
 		if (sql_vector[pos] == ",") pos++;
 	}
-	else if (sql_vector[pos] == "float")/*Èç¹ûÊÇfloatÀàĞÍ£¬ÉèÖÃattrµÄÊı¾İÀàĞÍÎªT_FLOAT,attr×Ö¶Î³¤¶ÈÎª4*/
+	else if (sql_vector[pos] == "float")/*å¦‚æœæ˜¯floatç±»å‹ï¼Œè®¾ç½®attrçš„æ•°æ®ç±»å‹ä¸ºT_FLOAT,attrå­—æ®µé•¿åº¦ä¸º4*/
 	{
 		attr.set_data_type(T_FLOAT);
 		attr.set_length(4);
 		pos++;
 		if (sql_vector[pos] == ",") pos++;
 	}
-	else if (sql_vector[pos] == "char" || sql_vector[pos] == "varchar")/*Èç¹ûÊÇchar»òÕßvarcharÀàĞÍ£¬ÉèÖÃattrµÄÊı¾İÀàĞÍÎªT_CHAR,attr×Ö¶Î³¤¶ÈÎªÓÃ»§ÉèÖÃ³¤¶È*/
+	else if (sql_vector[pos] == "char" || sql_vector[pos] == "varchar")/*å¦‚æœæ˜¯charæˆ–è€…varcharç±»å‹ï¼Œè®¾ç½®attrçš„æ•°æ®ç±»å‹ä¸ºT_CHAR,attrå­—æ®µé•¿åº¦ä¸ºç”¨æˆ·è®¾ç½®é•¿åº¦*/
 	{
 		attr.set_data_type(T_CHAR);
 		pos++;
@@ -64,26 +64,26 @@ int SQL::ParseDataType(vector<string> sql_vector, Attribute &attr, unsigned int 
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLCreateDatabase
-/*SQLCreateDatabaseµÄ¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šSQLCreateDatabase
+/*SQLCreateDatabaseçš„æ„é€ å‡½æ•°*/
 SQLCreateDatabase::SQLCreateDatabase(vector<string> sql_vector)
 {
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡databaseµÄÃû×Ö*/
+/*è·å–databaseçš„åå­—*/
 string SQLCreateDatabase::get_database_name()
 {
 	return database_name_;
 }
 
-/*ÉèÖÃdatabaseµÄÃû×Ö*/
+/*è®¾ç½®databaseçš„åå­—*/
 void SQLCreateDatabase::set_database_name(string dbname)
 {
 	database_name_ = dbname;
 }
 
-/*½âÎösql»ñÈ¡databaseµÄÃû×Ö*/
+/*è§£æsqlè·å–databaseçš„åå­—*/
 void SQLCreateDatabase::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 21;
@@ -95,40 +95,40 @@ void SQLCreateDatabase::Parse(vector<string> sql_vector)
 }
 #pragma endregion	
 
-#pragma region class ÊµÏÖ£ºSQLCreateTable
-/*SQLCreateTableµÄ¹¹Ôìº¯Êı*/
-SQLCreateTable::SQLCreateTable(vector<string> sql_vector)
+#pragma region class å®ç°ï¼šSQLCreateTable
+/*SQLCreateTableçš„æ„é€ å‡½æ•°*/
+SQLCreateTable::SQLCreateTable(vector<string> sql_vector) 
 {
-	Parse(sql_vector);
+	Parse(sql_vector); 
 }
-/*»ñÈ¡tableµÄÃû×Ö*/
-string SQLCreateTable::get_table_name()
+/*è·å–tableçš„åå­—*/
+string SQLCreateTable::get_table_name() 
+{ 
+	return table_name_; 
+}
+/*è®¾ç½®tableçš„åå­—*/
+void SQLCreateTable::set_table_name(string dbname) 
 {
-	return table_name_;
+	table_name_ = dbname; 
 }
-/*ÉèÖÃtableµÄÃû×Ö*/
-void SQLCreateTable::set_table_name(string dbname)
-{
-	table_name_ = dbname;
-}
-/*»ñÈ¡tableµÄÊôĞÔ*/
+/*è·å–tableçš„å±æ€§*/
 vector<Attribute> SQLCreateTable::get_attributes()
-{
+{ 
 	return attributes_;
 }
-/*ÉèÖÃtableµÄÊôĞÔ*/
+/*è®¾ç½®tableçš„å±æ€§*/
 void SQLCreateTable::SetAttributes(vector<Attribute> attr)
 {
-	attributes_ = attr;
+	attributes_  = attr;
 }
-/*½âÎösql»ñÈ¡tableµÄÃû×Ö¡¢tableÊôĞÔ¡£ÀıÈçcreate table student (name char(100), id int, primary key(id));*/
+/*è§£æsqlè·å–tableçš„åå­—ã€tableå±æ€§ã€‚ä¾‹å¦‚create table student (name char(100), id int, primary key(id));*/
 void SQLCreateTable::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 22;
 	unsigned int pos = 2;
-	if (sql_vector.size() <= pos) throw SyntaxErrorException();/*Èç¹ûÖ»ÓĞcreate table ÓïÒå´íÎó*/
+	if (sql_vector.size() <= pos) throw SyntaxErrorException();/*å¦‚æœåªæœ‰create table è¯­ä¹‰é”™è¯¯*/
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡table name*/
+	table_name_ = sql_vector[pos];/*è·å–table name*/
 	pos++;
 
 	if (sql_vector[pos] != "(") throw SyntaxErrorException();
@@ -143,22 +143,22 @@ void SQLCreateTable::Parse(vector<string> sql_vector)
 		if (sql_vector[pos] != "primary")/*name char(100)*/
 		{
 			Attribute attr;
-			attr.set_attribute_name(sql_vector[pos]);/*»ñÈ¡×Ö¶ÎÃû³Æ*/
+			attr.set_attribute_name(sql_vector[pos]);/*è·å–å­—æ®µåç§°*/
 			pos++;
-			pos = ParseDataType(sql_vector, attr, pos);/*»ñÈ¡×Ö¶ÎµÄÊı¾İÀàĞÍ*/
-			attributes_.push_back(attr);/*Ïò×Ö¶ÎvectorÖĞÌí¼Ó×Ö¶ÎĞÅÏ¢*/
-			if (sql_vector[pos] != ")") if_attr = true;/*Èç¹ûÕâ²»ÊÇ×îºóÒ»¸ö×Ö¶Î*/
+			pos = ParseDataType(sql_vector, attr, pos);/*è·å–å­—æ®µçš„æ•°æ®ç±»å‹*/
+			attributes_.push_back(attr);/*å‘å­—æ®µvectorä¸­æ·»åŠ å­—æ®µä¿¡æ¯*/
+			if (sql_vector[pos] != ")") if_attr = true;/*å¦‚æœè¿™ä¸æ˜¯æœ€åä¸€ä¸ªå­—æ®µ*/
 		}
 		else/* primary key(id))*/
 		{
-			if (if_primary_key) throw SyntaxErrorException();/*Èç¹ûÒÑ¾­ÓĞÖ÷¼ü·µ»Ø´íÎó*/
+			if (if_primary_key) throw SyntaxErrorException();/*å¦‚æœå·²ç»æœ‰ä¸»é”®è¿”å›é”™è¯¯*/
 			pos++;
-			if (sql_vector[pos] != "key") throw SyntaxErrorException();/*Èç¹û¸ñÊ½²»Îª primary keyÔò·µ»Ø´íÎó*/
+			if (sql_vector[pos] != "key") throw SyntaxErrorException();/*å¦‚æœæ ¼å¼ä¸ä¸º primary keyåˆ™è¿”å›é”™è¯¯*/
 			pos++;
-			if (sql_vector[pos] != "(") throw SyntaxErrorException();/*Èç¹û¸ñÊ½²»Îª primary key( Ôò·µ»Ø´íÎó*/
+			if (sql_vector[pos] != "(") throw SyntaxErrorException();/*å¦‚æœæ ¼å¼ä¸ä¸º primary key( åˆ™è¿”å›é”™è¯¯*/
 			pos++;
 			bool if_arrt_exist = false;
-			for (auto att = attributes_.begin(); att != attributes_.end(); att++)/*»ñÈ¡Ö®Ç°½âÎöµÄËùÓĞ×Ö¶Î£¬²éÕÒÊÇ·ñÓĞprimary keyÖĞµÄ¸Ãid×Ö¶Î*/
+			for (auto att = attributes_.begin(); att != attributes_.end(); att++)/*è·å–ä¹‹å‰è§£æçš„æ‰€æœ‰å­—æ®µï¼ŒæŸ¥æ‰¾æ˜¯å¦æœ‰primary keyä¸­çš„è¯¥idå­—æ®µ*/
 			{
 				if ((*att).get_attr_name() == sql_vector[pos])
 				{
@@ -166,178 +166,178 @@ void SQLCreateTable::Parse(vector<string> sql_vector)
 					if_arrt_exist = true;
 				}
 			}
-			if (if_arrt_exist == false) throw SyntaxErrorException();/*Èç¹ûprimary key µÄ×Ö¶ÎÔÚÖ®Ç°½âÎöµÄ×Ö¶ÎÖĞ²»´æÔÚÔò·µ»Ø´íÎó*/
+			if (if_arrt_exist == false) throw SyntaxErrorException();/*å¦‚æœprimary key çš„å­—æ®µåœ¨ä¹‹å‰è§£æçš„å­—æ®µä¸­ä¸å­˜åœ¨åˆ™è¿”å›é”™è¯¯*/
 			pos++;
-			if (sql_vector[pos] != ")") throw SyntaxErrorException();/*Èç¹û¸ñÊ½²»Îª primary key(id) Ôò·µ»Ø´íÎó*/
+			if (sql_vector[pos] != ")") throw SyntaxErrorException();/*å¦‚æœæ ¼å¼ä¸ä¸º primary key(id) åˆ™è¿”å›é”™è¯¯*/
 			if_primary_key = true;
 		}
 	}
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLCreateIndex
-/*SQLCreateIndexµÄ¹¹Ôìº¯Êı*/
-SQLCreateIndex::SQLCreateIndex(vector<string> sql_vector)
-{
+#pragma region class å®ç°ï¼šSQLCreateIndex
+/*SQLCreateIndexçš„æ„é€ å‡½æ•°*/
+SQLCreateIndex::SQLCreateIndex(vector<string> sql_vector) 
+{ 
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
-string SQLCreateIndex::get_tb_name()
-{
+/*è·å–tableçš„åå­—*/
+string SQLCreateIndex::get_tb_name() 
+{ 
 	return table_name_;
 }
 
-/*»ñÈ¡Ë÷ÒıµÄÃû×Ö*/
-string SQLCreateIndex::get_index_name()
+/*è·å–ç´¢å¼•çš„åå­—*/
+string SQLCreateIndex::get_index_name() 
 {
-	return index_name_;
+	return index_name_; 
 }
 
-/*»ñÈ¡½¨Á¢Ë÷Òı×Ö¶ÎµÄÃû×Ö*/
+/*è·å–å»ºç«‹ç´¢å¼•å­—æ®µçš„åå­—*/
 string SQLCreateIndex::get_column_name()
-{
+{ 
 	return col_name_;
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×Ö¡¢Ë÷ÒıµÄÃû×Ö¡¢½¨Á¢Ë÷Òı×Ö¶ÎµÄÃû×Ö ÀıÈç£ºcreate index i1 on student(id); */
+/*è§£æsqlè·å–tableçš„åå­—ã€ç´¢å¼•çš„åå­—ã€å»ºç«‹ç´¢å¼•å­—æ®µçš„åå­— ä¾‹å¦‚ï¼šcreate index i1 on student(id); */
 void SQLCreateIndex::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 23;
 	unsigned int pos = 2;
-	if (sql_vector.size() <= pos) throw SyntaxErrorException();/*Èç¹ûsqlÀàĞÍÎª create indexÔò·µ»ØÓïÒå´íÎó*/
+	if (sql_vector.size() <= pos) throw SyntaxErrorException();/*å¦‚æœsqlç±»å‹ä¸º create indexåˆ™è¿”å›è¯­ä¹‰é”™è¯¯*/
 
-	index_name_ = sql_vector[pos];/*»ñÈ¡indexµÄÃû×Ö*/
+	index_name_ = sql_vector[pos];/*è·å–indexçš„åå­—*/
 	pos++;
 
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "on") throw SyntaxErrorException();/*Èç¹ûsql²»Îªcreate index i1 on Ôò·µ»Ø´íÎó*/
+	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "on") throw SyntaxErrorException();/*å¦‚æœsqlä¸ä¸ºcreate index i1 on åˆ™è¿”å›é”™è¯¯*/
 	pos++;
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡table µÄÃû×Ö*/
+	table_name_ = sql_vector[pos];/*è·å–table çš„åå­—*/
 	pos++;
 
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "(") throw SyntaxErrorException();/*Èç¹ûsql²»Îªcreate index i1 on t1( Ôò·µ»Ø´íÎó*/
+	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "(") throw SyntaxErrorException();/*å¦‚æœsqlä¸ä¸ºcreate index i1 on t1( åˆ™è¿”å›é”™è¯¯*/
 	pos++;
 
-	col_name_ = sql_vector[pos];/*»ñÈ¡½¨Á¢Ë÷ÒıµÄ×Ö¶ÎÃû*/
+	col_name_ = sql_vector[pos];/*è·å–å»ºç«‹ç´¢å¼•çš„å­—æ®µå*/
 	pos++;
 
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != ")") throw SyntaxErrorException();/*Èç¹ûsql²»Îªcreate index i1 on t1(id) Ôò·µ»Ø´íÎó*/
+	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != ")") throw SyntaxErrorException();/*å¦‚æœsqlä¸ä¸ºcreate index i1 on t1(id) åˆ™è¿”å›é”™è¯¯*/
 	pos++;
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLDropDatabase
-/*SQLDropDatabaseµÄ¹¹Ôìº¯Êı*/
-SQLDropDatabase::SQLDropDatabase(vector<string> sql_vector)
+#pragma region class å®ç°ï¼šSQLDropDatabase
+/*SQLDropDatabaseçš„æ„é€ å‡½æ•°*/
+SQLDropDatabase::SQLDropDatabase(vector<string> sql_vector) 
 {
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡Êı¾İ¿âµÄÃû×Ö*/
-string SQLDropDatabase::get_database_name()
+/*è·å–æ•°æ®åº“çš„åå­—*/
+string SQLDropDatabase::get_database_name() 
 {
 	return database_name_;
 }
 
-/*ÉèÖÃÊı¾İ¿âµÄÃû×Ö*/
-void SQLDropDatabase::set_database_name(string dbname)
-{
-	database_name_ = dbname;
+/*è®¾ç½®æ•°æ®åº“çš„åå­—*/
+void SQLDropDatabase::set_database_name(string dbname) 
+{ 
+	database_name_ = dbname; 
 }
 
-/*½âÎösql»ñÈ¡Êı¾İ¿âÃû×Ö ÀıÈç£ºdrop database university;*/
+/*è§£æsqlè·å–æ•°æ®åº“åå­— ä¾‹å¦‚ï¼šdrop database university;*/
 void SQLDropDatabase::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 41;
-	if (sql_vector.size() <= 2 || sql_vector.size()>3) throw SyntaxErrorException();/*Èç¹ûsqlÓï¾ä²»Îªdrop database university·µ»Ø´íÎó*/
+	if (sql_vector.size() <= 2|| sql_vector.size()>3) throw SyntaxErrorException();/*å¦‚æœsqlè¯­å¥ä¸ä¸ºdrop database universityè¿”å›é”™è¯¯*/
 	else
 	{
-		database_name_ = sql_vector[2];/*»ñÈ¡databaseµÄÃû×Ö*/
+		database_name_ = sql_vector[2];/*è·å–databaseçš„åå­—*/
 	}
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLDropTable
-/*SQLDropTableµÄ¹¹Ôìº¯Êı*/
-SQLDropTable::SQLDropTable(vector<string> sql_vector)
-{
-	Parse(sql_vector);
+#pragma region class å®ç°ï¼šSQLDropTable
+/*SQLDropTableçš„æ„é€ å‡½æ•°*/
+SQLDropTable::SQLDropTable(vector<string> sql_vector) 
+{ 
+	Parse(sql_vector); 
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
-string SQLDropTable::get_table_name()
-{
-	return table_name_;
+/*è·å–tableçš„åå­—*/
+string SQLDropTable::get_table_name() 
+{ 
+	return table_name_; 
 }
 
-/*ÉèÖÃtableµÄÃû×Ö*/
-void SQLDropTable::set_table_name(string tbname)
-{
-	table_name_ = tbname;
+/*è®¾ç½®tableçš„åå­—*/
+void SQLDropTable::set_table_name(string tbname) 
+{ 
+	table_name_ = tbname; 
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×Ö ÀıÈç£ºdrop table student;*/
+/*è§£æsqlè·å–tableçš„åå­— ä¾‹å¦‚ï¼šdrop table student;*/
 void SQLDropTable::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 42;
-	if (sql_vector.size() <= 2 || sql_vector.size()>3) throw SyntaxErrorException();/*Èç¹ûsqlÓï¾ä²»Îªdrop table student;·µ»Ø´íÎó*/
+	if (sql_vector.size() <= 2|| sql_vector.size()>3) throw SyntaxErrorException();/*å¦‚æœsqlè¯­å¥ä¸ä¸ºdrop table student;è¿”å›é”™è¯¯*/
 	else table_name_ = sql_vector[2];
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLDropIndex
-/*SQLDropIndexµÄ¹¹Ôìº¯Êı*/
-SQLDropIndex::SQLDropIndex(vector<string> sql_vector)
-{
+#pragma region class å®ç°ï¼šSQLDropIndex
+/*SQLDropIndexçš„æ„é€ å‡½æ•°*/
+SQLDropIndex::SQLDropIndex(vector<string> sql_vector) 
+{ 
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡indexµÄÃû×Ö*/
+/*è·å–indexçš„åå­—*/
 string SQLDropIndex::get_index_name()
-{
-	return index_name_;
+{ 
+	return index_name_; 
 }
 
-/*ÉèÖÃindexµÄÃû×Ö*/
-void SQLDropIndex::set_index_name(string idxname)
-{
+/*è®¾ç½®indexçš„åå­—*/
+void SQLDropIndex::set_index_name(string idxname) 
+{ 
 	index_name_ = idxname;
 }
 
-/*½âÎösql»ñÈ¡indexµÄÃû×Ö drop index i1;*/
+/*è§£æsqlè·å–indexçš„åå­— drop index i1;*/
 void SQLDropIndex::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 52;
-	if (sql_vector.size() <= 2 || sql_vector.size()>3) throw SyntaxErrorException();/*Èç¹ûsqlÓï¾ä²»Îª drop index i1;·µ»Ø´íÎó*/
+	if (sql_vector.size() <= 2|| sql_vector.size()>3) throw SyntaxErrorException();/*å¦‚æœsqlè¯­å¥ä¸ä¸º drop index i1;è¿”å›é”™è¯¯*/
 	else index_name_ = sql_vector[2];
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLUse
-/*SQLUseµÄ¹¹Ôìº¯Êı*/
+#pragma region class å®ç°ï¼šSQLUse
+/*SQLUseçš„æ„é€ å‡½æ•°*/
 SQLUse::SQLUse(vector<string> sql_vector)
 {
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡Êı¾İ¿âµÄÃû×Ö*/
-string SQLUse::get_database_name()
+/*è·å–æ•°æ®åº“çš„åå­—*/
+string SQLUse::get_database_name() 
 {
 	return database_name_;
 }
 
-/*ÉèÖÃÊı¾İ¿âµÄÃû×Ö*/
+/*è®¾ç½®æ•°æ®åº“çš„åå­—*/
 void SQLUse::set_database_name(string dbname)
 {
-	database_name_ = dbname;
+	database_name_ = dbname; 
 }
 
-/*½âÎösql»ñÈ¡Êı¾İ¿âµÄÃû×Öuse university£º*/
+/*è§£æsqlè·å–æ•°æ®åº“çš„åå­—use universityï¼š*/
 void SQLUse::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 91;
-	if (sql_vector.size() <= 1 || sql_vector.size()>2) throw SyntaxErrorException();/*Èç¹ûsqlÀàĞÍ²»Îªuse university;Ôò·µ»Ø´íÎó*/
+	if (sql_vector.size() <= 1|| sql_vector.size()>2) throw SyntaxErrorException();/*å¦‚æœsqlç±»å‹ä¸ä¸ºuse university;åˆ™è¿”å›é”™è¯¯*/
 	else
 	{
 		database_name_ = sql_vector[1];
@@ -345,42 +345,42 @@ void SQLUse::Parse(vector<string> sql_vector)
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLInsert
-/*SQLInsertµÄ¹¹Ôìº¯Êı*/
-SQLInsert::SQLInsert(vector<string> sql_vector)
-{
-	Parse(sql_vector);
+#pragma region class å®ç°ï¼šSQLInsert
+/*SQLInsertçš„æ„é€ å‡½æ•°*/
+SQLInsert::SQLInsert(vector<string> sql_vector) 
+{ 
+	Parse(sql_vector); 
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
+/*è·å–tableçš„åå­—*/
 string SQLInsert::get_tb_name()
 {
-	return table_name_;
+	return table_name_; 
 }
 
-/*»ñÈ¡SQLValueµÄÖµ*/
-vector<SQLValue>& SQLInsert::GetValues()
-{
+/*è·å–SQLValueçš„å€¼*/
+vector<SQLValue>& SQLInsert::GetValues() 
+{ 
 	return values_;
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLValueµÄÖµ  insert into student values('Tom',1);*/
+/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLValueçš„å€¼  insert into student values('Tom',1);*/
 void SQLInsert::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 51;
 	unsigned int pos = 1;
 	bool if_attr = true;
 
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "into") throw SyntaxErrorException();/*Èç¹ûsql²»Îª insert into Ôò·µ»Ø´íÎó*/
+	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "into") throw SyntaxErrorException();/*å¦‚æœsqlä¸ä¸º insert into åˆ™è¿”å›é”™è¯¯*/
 	pos++;
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡²åÈëµÄ±íµÄÃû³Æ*/
+	table_name_ = sql_vector[pos];/*è·å–æ’å…¥çš„è¡¨çš„åç§°*/
 	pos++;
 
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "values") throw SyntaxErrorException();/*Èç¹ûsql ²»Îª insert into student valuesÔò·µ»Ø´íÎó*/
+	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "values") throw SyntaxErrorException();/*å¦‚æœsql ä¸ä¸º insert into student valuesåˆ™è¿”å›é”™è¯¯*/
 	pos++;
 
-	if (sql_vector[pos] != "(") throw SyntaxErrorException();/*Èç¹ûsql ²»Îª insert into student values(Ôò·µ»Ø´íÎó*/
+	if (sql_vector[pos] != "(") throw SyntaxErrorException();/*å¦‚æœsql ä¸ä¸º insert into student values(åˆ™è¿”å›é”™è¯¯*/
 	pos++;
 
 	while (if_attr)/*'Tom',1*/
@@ -390,7 +390,7 @@ void SQLInsert::Parse(vector<string> sql_vector)
 		string val = sql_vector[pos];
 		if (val[0] == '\'' || val[0] == '\"')/*'Tom'*/
 		{
-			val.assign(val, 1, val.length() - 2);/*ÓÃTom¸³Öµ¸øval*/
+			val.assign(val, 1, val.length() - 2);/*ç”¨Tomèµ‹å€¼ç»™val*/
 			sql_value.data_type = 2;
 		}
 		else
@@ -407,7 +407,7 @@ void SQLInsert::Parse(vector<string> sql_vector)
 		sql_value.value = val;
 		values_.push_back(sql_value);
 		pos++;
-		if (sql_vector[pos] != ")")/*ºóÃæ»¹ÓĞvalue*/
+		if (sql_vector[pos] != ")")/*åé¢è¿˜æœ‰value*/
 		{
 			if_attr = true;
 		}
@@ -416,32 +416,32 @@ void SQLInsert::Parse(vector<string> sql_vector)
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLSelect
-/*SQLSelectµÄ¹¹Ôìº¯Êı*/
-SQLSelect::SQLSelect(vector<string> sql_vector)
-{
+#pragma region class å®ç°ï¼šSQLSelect
+/*SQLSelectçš„æ„é€ å‡½æ•°*/
+SQLSelect::SQLSelect(vector<string> sql_vector) 
+{ 
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
+/*è·å–tableçš„åå­—*/
 string SQLSelect::get_tb_name()
 {
-	return table_name_;
+	return table_name_; 
 }
 
-/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
+/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
 vector<SQLWhere>& SQLSelect::GetWheres()
-{
+{ 
 	return wheres_;
 }
 
-/*»ñÈ¡±äÁ¿select_attribute_*/
+/*è·å–å˜é‡select_attribute_*/
 vector<string>& SQLSelect::get_select_attribute()
 {
 	return select_attribute_;
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµ select * from student where name = 'Tom';ÔİÊ±Ö»Ö§³Öselect**/
+/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼ */
 void SQLSelect::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 61;
@@ -451,7 +451,8 @@ void SQLSelect::Parse(vector<string> sql_vector)
 	{
 		select_attribute_.push_back(sql_vector[pos]);
 		pos++;
-		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "from") throw SyntaxErrorException();/*select * from*/
+		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "from") 
+			throw SyntaxErrorException();/*select * from*/
 		pos++;
 	}
 	else
@@ -462,6 +463,7 @@ void SQLSelect::Parse(vector<string> sql_vector)
 			{
 				throw SyntaxErrorException();
 			}
+			//æŠŠè¦æŸ¥è¯¢çš„å­—æ®µæ”¾åˆ°select_attribute_é‡Œ
 			select_attribute_.push_back(sql_vector[pos]);
 			pos++;
 			if (sql_vector[pos] == ",")
@@ -477,7 +479,7 @@ void SQLSelect::Parse(vector<string> sql_vector)
 		pos++;
 	}
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡tableÃû×Ö*/
+	table_name_ = sql_vector[pos];/*è·å–tableåå­—*/
 	pos++;
 
 	if (sql_vector.size() == pos) return;
@@ -487,7 +489,7 @@ void SQLSelect::Parse(vector<string> sql_vector)
 	while (true)
 	{
 		SQLWhere sql_where;
-		sql_where.key = sql_vector[pos];
+		sql_where.key_1 = sql_vector[pos];
 		pos++;
 
 		if (sql_vector[pos] == "<") sql_where.op_type = SIGN_LT;
@@ -503,111 +505,210 @@ void SQLSelect::Parse(vector<string> sql_vector)
 		wheres_.push_back(sql_where);
 		pos++;
 
-		if (sql_vector.size() == pos) break; /*where Óï¾äµ½´Ë½áÊø*/
+		if (sql_vector.size() == pos) break; /*where è¯­å¥åˆ°æ­¤ç»“æŸ*/
 		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "and") throw SyntaxErrorException();/*select * from student where id=1 and name ='Tom'*/
 		pos++;
 	}
 }
 #pragma endregion
 
-#pragma region  class ÊµÏÖ£ºSQLJoinSelect
+#pragma region  class å®ç°ï¼šSQLJoinSelect
 SQLJoinSelect::SQLJoinSelect(vector<string> sql_vector)
 {
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
+/*è·å–tableçš„åå­—*/
 vector<string>  SQLJoinSelect::get_table_names()
 {
 	return table_names_;
 }
 
-/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
+vector<string> SQLJoinSelect::get_selected_info()
+{
+	return selected_info_;
+}
+
+/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
 vector<SQLWhere>& SQLJoinSelect::get_wheres()
 {
 	return wheres_;
 }
-/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµ select * from student join study where name = 'Tom';ÔİÊ±Ö»Ö§³Öselect**/
+/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼ select *|table.attribute from student join study where student.name = 'Tom';*/
 void SQLJoinSelect::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 62;
 	unsigned int pos = 1;
-	if (sql_vector.size() <= 1) throw SyntaxErrorException();/*select*/
-	if (sql_vector[pos] != "*") throw SyntaxErrorException();/*select */
-	pos++;
-
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "from") throw SyntaxErrorException();/*select * from*/
-	pos++;
-
-	int table_count = 0;
-	while (sql_vector.size() != pos&&boost::algorithm::to_lower_copy(sql_vector[pos]) != "where")
+	if (sql_vector.size() <= 1) throw SyntaxErrorException();
+	//æ‰¾åˆ°fromçš„ä½ç½®
+	unsigned int from_pos;
+	bool whether_have_from = false;
+	for (from_pos = pos; from_pos < sql_vector.size(); from_pos++)
 	{
-		table_names_[table_count++] = sql_vector[pos];/*»ñÈ¡tableÃû×Ö*/
-		pos++;
-		if (sql_vector.size() != pos&&sql_vector[pos] != "where")
+		if (sql_vector[from_pos] == "from")
 		{
-			if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "join")
+			whether_have_from = true;
+			break;
+		}
+	}
+	if (!whether_have_from) throw SyntaxErrorException();
+
+	//å°†select åˆ° fromä¹‹é—´çš„å±æ€§ä¿¡æ¯å­˜å‚¨èµ·æ¥,æ ¹æ®é€—å·åˆ†éš”
+	for (; pos <= from_pos ; pos++)
+	{
+		if (sql_vector[pos] == "," || pos == from_pos)
+		{
+			if (sql_vector[pos - 1].find('.') == string::npos)
+				throw SyntaxErrorException();
+			selected_info_.push_back(sql_vector[pos-1]);
+		}
+	}
+	
+	int position = from_pos + 1;
+
+	//è·å–tableçš„åå­—å¹¶å­˜åˆ°table_namesä¸­
+	while (sql_vector.size() != position && boost::algorithm::to_lower_copy(sql_vector[position]) != "where")
+	{
+		table_names_.push_back(sql_vector[position]);/*è·å–tableåå­—*/
+		position++;
+		if (sql_vector.size() != position && sql_vector[position] != "where")
+		{
+			if (boost::algorithm::to_lower_copy(sql_vector[position]) != "join")
 			{
 				throw SyntaxErrorException();
 			}
 			else
 			{
-				pos++;
+				position++;
 			}
 		}
 	}
+	position++;
 
-
-	if (sql_vector.size() == pos) return; /*select * from student; */
-	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "where") throw SyntaxErrorException();/*select * from student where*/
-	pos++;
+	//åˆ¤æ–­table.atträ¸­çš„tableæ˜¯å¦åˆæ³•
+	for (auto iterator = selected_info_.begin(); iterator < selected_info_.end(); iterator++)
+	{
+		int Pos_ = (*iterator).find('.');
+		string tbName = (*iterator).substr(0, Pos_);
+		bool tbFlag = false;
+		for (auto it_ = table_names_.begin(); it_ != table_names_.end(); it_++)
+		{
+			if ((*it_) == tbName)
+			{
+				tbFlag = true;
+				break;
+			}
+		}
+		if (!tbFlag)
+			throw SyntaxErrorException();
+	}
 
 	while (true)
 	{
 		SQLWhere sql_where;
-		sql_where.key = sql_vector[pos];
-		pos++;
+		//table1.attr1 operator value
+		if (position + 2 >= sql_vector.size())
+			throw SyntaxErrorException();
+		else
+		{
+			//åˆ¤æ–­table.attributeæ˜¯å¦åˆæ³•
+			bool valid = false;
+			if (sql_vector[position].find('.') == string::npos)
+				throw SyntaxErrorException();
+			for (int i = 0; i < table_names_.size(); i++)
+			{
+				int P = sql_vector[position].find('.');
+				string cur_tb_name=sql_vector[position].substr(0,P);
+				if (table_names_[i] == cur_tb_name)
+				{
+					valid = true;
+					break;
+				}
+			}
+			if (!valid) throw SyntaxErrorException();
+			//table.attribute
+			sql_where.key_1 = sql_vector[position];
+			position ++;
 
-		if (sql_vector[pos] == "<") sql_where.op_type = SIGN_LT;
-		else if (sql_vector[pos] == "=") sql_where.op_type = SIGN_EQ;
-		else if (sql_vector[pos] == ">") sql_where.op_type = SIGN_GT;
-		else if (sql_vector[pos] == "<=") sql_where.op_type = SIGN_LE;
-		else if (sql_vector[pos] == ">=") sql_where.op_type = SIGN_GE;
-		else if (sql_vector[pos] == "<>") sql_where.op_type = SIGN_NE;
-		pos++;
+			if (sql_vector[position] == "<") sql_where.op_type = SIGN_LT;
+			else if (sql_vector[position] == "=") sql_where.op_type = SIGN_EQ;
+			else if (sql_vector[position] == ">") sql_where.op_type = SIGN_GT;
+			else if (sql_vector[position] == "<=") sql_where.op_type = SIGN_LE;
+			else if (sql_vector[position] == ">=") sql_where.op_type = SIGN_GE;
+			else if (sql_vector[position] == "<>") sql_where.op_type = SIGN_NE;
 
-		sql_where.value = sql_vector[pos];
-		if (sql_where.value[0] == '\'' || sql_where.value[0] == '\"') sql_where.value.assign(sql_where.value, 1, sql_where.value.length() - 2);
-		wheres_.push_back(sql_where);
-		pos++;
-
-		if (sql_vector.size() == pos) break; /*where Óï¾äµ½´Ë½áÊø*/
-		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "and") throw SyntaxErrorException();/*select * from student where id=1 and name ='Tom'*/
-		pos++;
+			position++;
+			
+			bool isTable = false;
+			string tbname;
+			int k = -1;
+			bool f = true;
+			if ((k = sql_vector[position].find('.')) == string::npos)
+				f = false;
+			else
+				tbname = sql_vector[position].substr(0, k);
+			if (f)
+			{
+				for (int i = 0; i < table_names_.size(); i++)
+				{
+					if (table_names_[i] == tbname)
+					{
+						isTable = true;
+						break;
+					}
+				}
+			}
+			//è‹¥æ˜¯table.attr
+			if(isTable)
+			{
+				sql_where.key_2 = sql_vector[position];
+				position ++;
+			}
+			//å€¼
+			else 
+			{
+				sql_where.value = sql_vector[position];
+				//è‹¥æ˜¯å­—ç¬¦ä¸²
+				if (sql_vector[position][0] == '\'' || sql_vector[position][0] == '\"')
+				{
+					//å–'' æˆ– ""é‡Œçš„å†…å®¹
+					sql_where.value.assign(sql_where.value, 1, sql_where.value.length() - 2);
+				}
+				//ét1.attr1=t2.attr2
+				sql_where.key_2 = "";
+				position++;
+			}
+			
+			wheres_.push_back(sql_where);
+			if (sql_vector.size() == position) break; /*where è¯­å¥åˆ°æ­¤ç»“æŸ*/
+			if (boost::algorithm::to_lower_copy(sql_vector[position]) != "and") 
+				throw SyntaxErrorException();/*select student.id from student join takes where student.id=takes.id and student.name ='Tom'*/
+			position++;
+		}
 	}
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLDelete
-/*SQLDeleteµÄ¹¹Ôìº¯Êı*/
-SQLDelete::SQLDelete(vector<string> sql_vector)
+#pragma region class å®ç°ï¼šSQLDelete
+/*SQLDeleteçš„æ„é€ å‡½æ•°*/
+SQLDelete::SQLDelete(vector<string> sql_vector) 
 {
 	Parse(sql_vector);
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
+/*è·å–tableçš„åå­—*/
 string SQLDelete::get_tb_name()
-{
-	return table_name_;
+{ 
+	return table_name_; 
 }
 
-/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
+/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
 vector<SQLWhere>& SQLDelete::GetWheres()
-{
+{ 
 	return wheres_;
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµ delete from student where name='Tom';*/
+/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼ delete from student where name='Tom';*/
 void SQLDelete::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 71;
@@ -616,17 +717,17 @@ void SQLDelete::Parse(vector<string> sql_vector)
 	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "from") throw SyntaxErrorException();/*delete from*/
 	pos++;
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡tableµÄÃû×Ö*/
+	table_name_ = sql_vector[pos];/*è·å–tableçš„åå­—*/
 	pos++;
 
-	if (sql_vector.size() == pos) return; /*delete from student;¼´°Ñ¸Ä±äÊı¾İÈ«²¿É¾³ı*/
+	if (sql_vector.size() == pos) return; /*delete from student;å³æŠŠæ”¹å˜æ•°æ®å…¨éƒ¨åˆ é™¤*/
 	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "where") throw SyntaxErrorException();/*delete from studetn where*/
 	pos++;
 
 	while (true)
 	{
 		SQLWhere sql_where;
-		sql_where.key = sql_vector[pos];
+		sql_where.key_1 = sql_vector[pos];
 		pos++;
 
 		if (sql_vector[pos] == "<") sql_where.op_type = SIGN_LT;
@@ -642,7 +743,7 @@ void SQLDelete::Parse(vector<string> sql_vector)
 		wheres_.push_back(sql_where);
 		pos++;
 
-		if (sql_vector.size() == pos) break; /*where Ìõ¼şµ½´Ë½áÊø */
+		if (sql_vector.size() == pos) break; /*where æ¡ä»¶åˆ°æ­¤ç»“æŸ */
 		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "and") throw SyntaxErrorException();/*delete  from student where id=1 and name ='Tom'*/
 		pos++;
 	}
@@ -650,69 +751,69 @@ void SQLDelete::Parse(vector<string> sql_vector)
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºSQLUpdate
-/*SQLUpdateµÄ¹¹Ôìº¯Êı*/
-SQLUpdate::SQLUpdate(vector<string> sql_vector)
-{
-	Parse(sql_vector);
+#pragma region class å®ç°ï¼šSQLUpdate
+/*SQLUpdateçš„æ„é€ å‡½æ•°*/
+SQLUpdate::SQLUpdate(vector<string> sql_vector) 
+{ 
+	Parse(sql_vector); 
 }
 
-/*»ñÈ¡tableµÄÃû×Ö*/
-string SQLUpdate::get_tb_name()
-{
+/*è·å–tableçš„åå­—*/
+string SQLUpdate::get_tb_name() 
+{ 
 	return table_name_;
 }
 
-/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
+/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
 vector<SQLWhere>& SQLUpdate::GetWheres()
-{
+{ 
 	return wheres_;
 }
 
-/*»ñÈ¡SQLKeyValueµÄÖµ¼´¸üĞÂ×Ö¶Î*/
-vector<SQLKeyValue>& SQLUpdate::GetKeyValues()
-{
+/*è·å–SQLKeyValueçš„å€¼å³æ›´æ–°å­—æ®µ*/
+vector<SQLKeyValue>& SQLUpdate::GetKeyValues() 
+{ 
 	return keyvalues_;
 }
 
-/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµºÍSQLKeyValueµÄÖµ update student set name ='Tim' where name='Tom';*/
+/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼å’ŒSQLKeyValueçš„å€¼ update student set name ='Tim' where name='Tom';*/
 void SQLUpdate::Parse(vector<string> sql_vector)
 {
 	sql_type_ = 81;
 	unsigned int pos = 1;
 	if (sql_vector.size() <= 1) throw SyntaxErrorException();/*update*/
 
-	table_name_ = sql_vector[pos];/*»ñÈ¡tableµÄÃû×Ö*/
+	table_name_ = sql_vector[pos];/*è·å–tableçš„åå­—*/
 	pos++;
 
 	if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "set") throw SyntaxErrorException();/*update student set*/
 	pos++;
 
-	while (true)/*»ñÈ¡set×Ö¶ÎÓë¶ÔÓ¦×Ö¶ÎÖµ*/
+	while (true)/*è·å–setå­—æ®µä¸å¯¹åº”å­—æ®µå€¼*/
 	{
 		SQLKeyValue sql_kv;
-		sql_kv.key = sql_vector[pos];/*»ñÈ¡set×Ö¶Î*/
+		sql_kv.key = sql_vector[pos];/*è·å–setå­—æ®µ*/
 		pos++;
 
 		if (sql_vector[pos] != "=") throw SyntaxErrorException();/*set name=*/
 		pos++;
 
-		sql_kv.value = sql_vector[pos];/*»ñÈ¡¶ÔÓ¦×Ö¶ÎÖµ*/
-		if (sql_kv.value[0] == '\'' || sql_kv.value[0] == '\"') sql_kv.value.assign(sql_kv.value, 1, sql_kv.value.length() - 2);/*'Tom'±äÎªTom*/
+		sql_kv.value = sql_vector[pos];/*è·å–å¯¹åº”å­—æ®µå€¼*/
+		if (sql_kv.value[0] == '\'' || sql_kv.value[0] == '\"') sql_kv.value.assign(sql_kv.value, 1, sql_kv.value.length() - 2);/*'Tom'å˜ä¸ºTom*/
 		keyvalues_.push_back(sql_kv);
 		pos++;
 
-		if (sql_vector[pos] == ",") pos++;/*Èç¹ûÓĞµÚ¶ş¸öset×Ö¶ÎÔò¼ÌĞø*/
-		else if (boost::algorithm::to_lower_copy(sql_vector[pos]) == "where") break;/*Èç¹ûºóÃæÊÇwhere×Ö¶ÎÔòÌø³öÑ­»·¿ªÊ¼»ñÈ¡where×Ö¶ÎÖµ*/
-		else throw SyntaxErrorException();/*ÓïÒå´íÎó*/
+		if (sql_vector[pos] == ",") pos++;/*å¦‚æœæœ‰ç¬¬äºŒä¸ªsetå­—æ®µåˆ™ç»§ç»­*/
+		else if (boost::algorithm::to_lower_copy(sql_vector[pos]) == "where") break;/*å¦‚æœåé¢æ˜¯whereå­—æ®µåˆ™è·³å‡ºå¾ªç¯å¼€å§‹è·å–whereå­—æ®µå€¼*/
+		else throw SyntaxErrorException();/*è¯­ä¹‰é”™è¯¯*/
 	}
 	if (sql_vector[pos] != "where") throw SyntaxErrorException();/*update student set name = 'Tim' where*/
 	pos++;
 
-	while (true)/*»ñÈ¡where×Ö¶ÎÖµ*/
+	while (true)/*è·å–whereå­—æ®µå€¼*/
 	{
 		SQLWhere sql_where;
-		sql_where.key = sql_vector[pos];
+		sql_where.key_1 = sql_vector[pos];
 		pos++;
 
 		if (sql_vector[pos] == "<") sql_where.op_type = SIGN_LT;
@@ -728,14 +829,14 @@ void SQLUpdate::Parse(vector<string> sql_vector)
 		wheres_.push_back(sql_where);
 		pos++;
 
-		if (sql_vector.size() == pos) break; /*where×Ö¶Îµ½´Ë½áÊø */
+		if (sql_vector.size() == pos) break; /*whereå­—æ®µåˆ°æ­¤ç»“æŸ */
 		if (boost::algorithm::to_lower_copy(sql_vector[pos]) != "and") throw SyntaxErrorException();/*update  student set name='Tim' where id=1 and name ='Tom'*/
 		pos++;
 	}
 }
 #pragma endregion
 
-#pragma region class ÊµÏÖ£ºTKey
+#pragma region class å®ç°ï¼šTKey
 /* ----------------- TKey -------------------- */
 TKey::TKey(int keytype, int length)
 {
@@ -882,56 +983,6 @@ bool TKey::operator==(const TKey t1)
 bool TKey::operator<=(const TKey t1) { return !(operator>(t1)); }
 bool TKey::operator>=(const TKey t1) { return !(operator<(t1)); }
 bool TKey::operator!=(const TKey t1) { return !(operator==(t1)); }
-//xj
-TKey* TKey::operator+=(const TKey t1) {
-	TKey * temp = new TKey(t1);
-	switch (t1.key_type_)
-	{
-	case 0:
-		*(int*)key_ += *(int*)(*temp).key_;
-		return temp;
-	case 1:
-		*(float*)key_ += *(float*)(*temp).key_;
-		return temp;
-	case 2:
-		key_ = "";
-		return nullptr;
-	default:
-		return nullptr;
-	}
-}
-
-TKey* TKey::operator/=(const TKey t1) {
-	TKey * temp = new TKey(*this);//not support varchar
-	switch (key_type_)
-	{
-	case 0:
-	case 1:
-		*(float*)key_ /= *(float*)(*temp).key_;
-	case 2:
-		key_ = "";
-		return nullptr;
-	default:
-		return nullptr;
-	}
-	return temp;
-}
-
-TKey* TKey::operator/=(const int t1) {
-	TKey * temp = new TKey(*this);//not support varchar
-	switch (key_type_)
-	{
-	case 0:
-	case 1:
-		*(float*)key_ /= (float)t1;
-		return temp;
-	case 2:
-		key_ = "";
-		return nullptr;
-	default:
-		return nullptr;
-	}
-}
 #pragma endregion
 /* ----------------- SQLExec ----------------*/
 //SQLExec::SQLExec(vector<string> sql_vector) { Parse(sql_vector); }
