@@ -22,6 +22,7 @@ public:
 	RecordManager(CatalogManager *cm, BufferManager *bm, string dbname);
 	~RecordManager(void);
 	string intToString(int x);
+	string floatToString(float x);
 	void Insert(SQLInsert& st);
 	vector<vector<TKey>> Select(SQLSelect& st);
 	void JoinSelect(SQLJoinSelect& st);
@@ -37,13 +38,13 @@ public:
 	void UpdateRecord(Table* tbl, int block_num, int offset, vector<int>& indices/*数据类型集合*/, vector<TKey>& values/*每个数据类型对应的键值集合*/);
 	//对于表tb1的某行键值集合是否满足where子句
 	bool SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where);
-
-	/**********************    聚集函数实现  ***************************/
-	//xj 06/16	aggregation
-	TKey Min(vector<vector<TKey>> tuples, int MinIndex);
-	TKey Max(vector<vector<TKey>> tuples, int MinIndex);
-	TKey* Avg(vector<vector<TKey>> tuples, int MinIndex);
-	int Count(vector<TKey> tuples, int Index);
+	
+	/**********************                  聚集函数实现                      ********************************/
+	//xj0616	aggregation
+	TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex);
+	TKey RecordManager::Max(vector<vector<TKey> > tuples, int MinIndex);
+	TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex);
+	int RecordManager::Count(vector<vector<TKey> > tuples, int Index);
 private:
 	CatalogManager* catalog_m_;
 	BufferManager* buffer_m_;
