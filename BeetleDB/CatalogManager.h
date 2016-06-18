@@ -23,80 +23,80 @@ class SQLDropIndex;
 class CatalogManager
 {
 public:
-	CatalogManager(string path);/*CatalogManager¹¹Ôìº¯Êı*/
-	~CatalogManager(void);/*CatalogManagerÎö¹¹º¯Êı*/
-	string get_path();/*»ñÈ¡±äÁ¿path_*/
-	vector<Database>& GetDBs();/*»ñÈ¡±äÁ¿,get_databases() dbs_*/
-	Database* GetDB(string database_name);/*¸ù¾İdatabaseÃû»ñÈ¡¶ÔÓ¦DatabaseÀà*/
-	void ReadArchiveFile();/*¶ÁÈ¡Ä¿Â¼ÎÄµµ*/
-	void WriteArchiveFile();/*Ğ´ÈëÄ¿Â¼ÎÄµµ*/
-	void CreateDatabase(string database_name);/*Ä¿Â¼ÖĞ¸ù¾İdatabaseÃû´´¼üÒ»¸ödatabase*/
-	void DeleteDatabase(string database_name);/*Ä¿Â¼ÖĞ¸ù¾İdatabaseÃûÉ¾³ıÒ»¸ödatabase*/
+	CatalogManager(string path);/*CatalogManageræ„é€ å‡½æ•°*/
+	~CatalogManager(void);/*CatalogManagerææ„å‡½æ•°*/
+	string get_path();/*è·å–å˜é‡path_*/
+	vector<Database>& GetDBs();/*è·å–å˜é‡,get_databases() dbs_*/
+	Database* GetDB(string database_name);/*æ ¹æ®databaseåè·å–å¯¹åº”Databaseç±»*/
+	void ReadArchiveFile();/*è¯»å–ç›®å½•æ–‡æ¡£*/
+	void WriteArchiveFile();/*å†™å…¥ç›®å½•æ–‡æ¡£*/
+	void CreateDatabase(string database_name);/*ç›®å½•ä¸­æ ¹æ®databaseååˆ›é”®ä¸€ä¸ªdatabase*/
+	void DeleteDatabase(string database_name);/*ç›®å½•ä¸­æ ¹æ®databaseååˆ é™¤ä¸€ä¸ªdatabase*/
 private:
-	friend class boost::serialization::access;/*ÓÑÔªº¯Êı¡£ÎªÁËÄÜÈÃ´®ĞĞ»¯Àà¿âÄÜ¹»·ÃÎÊË½ÓĞ³ÉÔ±£¬ËùÒÔÒªÉùÃ÷Ò»¸öÓÑÔªÀà*/
-	template<class Archive>/*´®ĞĞ»¯µÄº¯Êı£¬ÕâÒ»¸öº¯ÊıÍê³É¶ÔÏóµÄ±£´æÓë»Ö¸´*/
+	friend class boost::serialization::access;/*å‹å…ƒå‡½æ•°ã€‚ä¸ºäº†èƒ½è®©ä¸²è¡ŒåŒ–ç±»åº“èƒ½å¤Ÿè®¿é—®ç§æœ‰æˆå‘˜ï¼Œæ‰€ä»¥è¦å£°æ˜ä¸€ä¸ªå‹å…ƒç±»*/
+	template<class Archive>/*ä¸²è¡ŒåŒ–çš„å‡½æ•°ï¼Œè¿™ä¸€ä¸ªå‡½æ•°å®Œæˆå¯¹è±¡çš„ä¿å­˜ä¸æ¢å¤*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & databases_;
 	}
-	string path_;//´æ´¢databaseÎÄ¼şµÄÂ·¾¶±äÁ¿
-	vector<Database> databases_;//´æ´¢Êı¾İ¿âÀàµÄ±äÁ¿
+	string path_;//å­˜å‚¨databaseæ–‡ä»¶çš„è·¯å¾„å˜é‡
+	vector<Database> databases_;//å­˜å‚¨æ•°æ®åº“ç±»çš„å˜é‡
 };
 
 class Database {
 public:
-	Database();/*Database²»´ø²ÎÊı¹¹Ôìº¯Êı*/
-	Database(string database_name);/*Database´ø²ÎÊı¹¹Ôìº¯Êı*/
-	~Database();/*DatabaseÎö¹¹º¯Êı*/
-	string get_database_name();/*»ñÈ¡±äÁ¿database_name_*/
-	vector<Table>& get_tables();/*»ñÈ¡±äÁ¿tables_*/
-	Table* GetTable(string table_name);/*¸ù¾İtableÃû»ñÈ¡¶ÔÓ¦µÄTableÀà*/
-	void CreateTable(SQLCreateTable& obj);/*¸ù¾İSQLCreateTable¶ÔÏó´´½¨Ò»¸ötable*/
-	void DropTable(SQLDropTable& obj);/*¸ù¾İSQLDropTable¶ÔÏóÉ¾³ıÒ»ÕÅtable*/
-	void DropIndex(SQLDropIndex& obj);/*¸ù¾İSQLDropIndex¶ÔÏó´´½¨Ò»¸öindex*/
-	bool CheckIfIndexExists(string index_name);/*¸ù¾İË÷ÒıÃûÅĞ¶Ï¸ÃË÷ÒıÊÇ·ñ´æÔÚ*/
+	Database();/*Databaseä¸å¸¦å‚æ•°æ„é€ å‡½æ•°*/
+	Database(string database_name);/*Databaseå¸¦å‚æ•°æ„é€ å‡½æ•°*/
+	~Database();/*Databaseææ„å‡½æ•°*/
+	string get_database_name();/*è·å–å˜é‡database_name_*/
+	vector<Table>& get_tables();/*è·å–å˜é‡tables_*/
+	Table* GetTable(string table_name);/*æ ¹æ®tableåè·å–å¯¹åº”çš„Tableç±»*/
+	void CreateTable(SQLCreateTable& obj);/*æ ¹æ®SQLCreateTableå¯¹è±¡åˆ›å»ºä¸€ä¸ªtable*/
+	void DropTable(SQLDropTable& obj);/*æ ¹æ®SQLDropTableå¯¹è±¡åˆ é™¤ä¸€å¼ table*/
+	void DropIndex(SQLDropIndex& obj);/*æ ¹æ®SQLDropIndexå¯¹è±¡åˆ›å»ºä¸€ä¸ªindex*/
+	bool CheckIfIndexExists(string index_name);/*æ ¹æ®ç´¢å¼•ååˆ¤æ–­è¯¥ç´¢å¼•æ˜¯å¦å­˜åœ¨*/
 private:
-	friend class boost::serialization::access;/*ÓÑÔªº¯Êı¡£ÎªÁËÄÜÈÃ´®ĞĞ»¯Àà¿âÄÜ¹»·ÃÎÊË½ÓĞ³ÉÔ±£¬ËùÒÔÒªÉùÃ÷Ò»¸öÓÑÔªÀà*/
-	template<class Archive>/*´®ĞĞ»¯µÄº¯Êı£¬ÕâÒ»¸öº¯ÊıÍê³É¶ÔÏóµÄ±£´æÓë»Ö¸´*/
+	friend class boost::serialization::access;/*å‹å…ƒå‡½æ•°ã€‚ä¸ºäº†èƒ½è®©ä¸²è¡ŒåŒ–ç±»åº“èƒ½å¤Ÿè®¿é—®ç§æœ‰æˆå‘˜ï¼Œæ‰€ä»¥è¦å£°æ˜ä¸€ä¸ªå‹å…ƒç±»*/
+	template<class Archive>/*ä¸²è¡ŒåŒ–çš„å‡½æ•°ï¼Œè¿™ä¸€ä¸ªå‡½æ•°å®Œæˆå¯¹è±¡çš„ä¿å­˜ä¸æ¢å¤*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & database_name_;
 		ar & tables_;
 	}
-	string database_name_;//´æ´¢Êı¾İ¿âÃû×ÖµÄ±äÁ¿
-	vector<Table> tables_;//´æ´¢TableÀàµÄ±äÁ¿
+	string database_name_;//å­˜å‚¨æ•°æ®åº“åå­—çš„å˜é‡
+	vector<Table> tables_;//å­˜å‚¨Tableç±»çš„å˜é‡
 };
 
 class Table {
 public:
-	Table();/*TableµÄ¹¹Ôìº¯Êı*/
-	~Table();/*TableµÄÎö¹¹º¯Êı*/
-	string get_tb_name();/*»ñÈ¡±äÁ¿table_name_*/
-	void set_table_name(string table_name);/*ÉèÖÃ±äÁ¿table_name_*/
-	int get_record_length();/*»ñÈ¡±äÁ¿record_length_*/
-	void set_record_length(int len);/*ÉèÖÃ±äÁ¿record_length_*/
+	Table();/*Tableçš„æ„é€ å‡½æ•°*/
+	~Table();/*Tableçš„ææ„å‡½æ•°*/
+	string get_tb_name();/*è·å–å˜é‡table_name_*/
+	void set_table_name(string table_name);/*è®¾ç½®å˜é‡table_name_*/
+	int get_record_length();/*è·å–å˜é‡record_length_*/
+	void set_record_length(int len);/*è®¾ç½®å˜é‡record_length_*/
 
-	vector<Attribute>& GetAttributes();/*»ñÈ¡±äÁ¿attributes*/
-	Attribute* GetAttribute(string name);/*¸ù¾İ×Ö¶ÎÃû»ñÈ¡attribute¶ÔÏó*/
-	int GetAttributeIndex(string name);/*¸ù¾İ×Ö¶ÎÃû»ñÈ¡attribute¶ÔÏóµÄÎ»ÖÃ*/
+	vector<Attribute>& GetAttributes();/*è·å–å˜é‡attributes*/
+	Attribute* GetAttribute(string name);/*æ ¹æ®å­—æ®µåè·å–attributeå¯¹è±¡*/
+	int GetAttributeIndex(string name);/*æ ¹æ®å­—æ®µåè·å–attributeå¯¹è±¡çš„ä½ç½®*/
 
-	int get_first_block_num();/*»ñÈ¡±äÁ¿first_block_num*/
-	void set_first_block_num(int num);/*ÉèÖÃ±äÁ¿first_block_num*/
-	int get_first_rubbish_num();/*»ñÈ¡±äÁ¿first_rubbish_num_*/
-	void set_first_rubbish_num(int num);/*ÉèÖÃ±äÁ¿first_rubbish_num_*/
-	int get_block_count();/*»ñÈ¡±äÁ¿block_count_*/
+	int get_first_block_num();/*è·å–å˜é‡first_block_num*/
+	void set_first_block_num(int num);/*è®¾ç½®å˜é‡first_block_num*/
+	int get_first_rubbish_num();/*è·å–å˜é‡first_rubbish_num_*/
+	void set_first_rubbish_num(int num);/*è®¾ç½®å˜é‡first_rubbish_num_*/
+	int get_block_count();/*è·å–å˜é‡block_count_*/
 
-	unsigned long GetAttributeNum();/*»ñÈ¡×Ö¶ÎÊıÁ¿*/
-	void AddAttribute(Attribute& attr);/*´«ÈëAttribute¶ÔÏó£¬½«¸Ã¶ÔÏó²åÈëTable¶ÔÏóÖĞ*/
+	unsigned long GetAttributeNum();/*è·å–å­—æ®µæ•°é‡*/
+	void AddAttribute(Attribute& attr);/*ä¼ å…¥Attributeå¯¹è±¡ï¼Œå°†è¯¥å¯¹è±¡æ’å…¥Tableå¯¹è±¡ä¸­*/
 	void IncreaseBlockCount();/*block_count++*/
 
-	std::vector<Index>& get_indexs();/*»ñÈ¡±äÁ¿indexs*/
-	Index* GetIndex(int num);/*¸ù¾İindexÎ»ÖÃ»ñÈ¡¶ÔÓ¦µÄIndex¶ÔÏó*/
-	unsigned long GetIndexNum();/*»ñÈ¡IndexÊıÁ¿*/
-	void AddIndex(Index& idx);/*´«ÈëIndex¶ÔÏó£¬½«¸Ã¶ÔÏó²åÈë¸ÃTable¶ÔÏóÖĞ*/
+	std::vector<Index>& get_indexs();/*è·å–å˜é‡indexs*/
+	Index* GetIndex(int num);/*æ ¹æ®indexä½ç½®è·å–å¯¹åº”çš„Indexå¯¹è±¡*/
+	unsigned long GetIndexNum();/*è·å–Indexæ•°é‡*/
+	void AddIndex(Index& idx);/*ä¼ å…¥Indexå¯¹è±¡ï¼Œå°†è¯¥å¯¹è±¡æ’å…¥è¯¥Tableå¯¹è±¡ä¸­*/
 private:
-	friend class boost::serialization::access;/*ÓÑÔªº¯Êı¡£ÎªÁËÄÜÈÃ´®ĞĞ»¯Àà¿âÄÜ¹»·ÃÎÊË½ÓĞ³ÉÔ±£¬ËùÒÔÒªÉùÃ÷Ò»¸öÓÑÔªÀà*/
-	template<class Archive>/*´®ĞĞ»¯µÄº¯Êı£¬ÕâÒ»¸öº¯ÊıÍê³É¶ÔÏóµÄ±£´æÓë»Ö¸´*/
+	friend class boost::serialization::access;/*å‹å…ƒå‡½æ•°ã€‚ä¸ºäº†èƒ½è®©ä¸²è¡ŒåŒ–ç±»åº“èƒ½å¤Ÿè®¿é—®ç§æœ‰æˆå‘˜ï¼Œæ‰€ä»¥è¦å£°æ˜ä¸€ä¸ªå‹å…ƒç±»*/
+	template<class Archive>/*ä¸²è¡ŒåŒ–çš„å‡½æ•°ï¼Œè¿™ä¸€ä¸ªå‡½æ•°å®Œæˆå¯¹è±¡çš„ä¿å­˜ä¸æ¢å¤*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & table_name_;
@@ -107,32 +107,32 @@ private:
 		ar & attributes_;
 		ar & indexs_;
 	}
-	string table_name_;//´æ´¢Êı¾İ±íÃû×ÖµÄ±äÁ¿
-	int record_length_;//´æ´¢¼ÇÂ¼×Ü³¤¶ÈµÄ±äÁ¿
-	int first_block_num_;//´æ´¢µÚÒ»¸ö¿éµÄµØÖ·µÄ±äÁ¿
+	string table_name_;//å­˜å‚¨æ•°æ®è¡¨åå­—çš„å˜é‡
+	int record_length_;//å­˜å‚¨è®°å½•æ€»é•¿åº¦çš„å˜é‡
+	int first_block_num_;//å­˜å‚¨ç¬¬ä¸€ä¸ªå—çš„åœ°å€çš„å˜é‡
 	int first_rubbish_num_;
-	int block_count_;//´æ´¢¿éµÄÊıÁ¿µÄ±äÁ¿
+	int block_count_;//å­˜å‚¨å—çš„æ•°é‡çš„å˜é‡
 
-	std::vector<Attribute> attributes_;//´æ´¢×Ö¶ÎµÄ±äÁ¿
-	std::vector<Index> indexs_;//´æ´¢Ë÷ÒıµÄ±äÁ¿
+	std::vector<Attribute> attributes_;//å­˜å‚¨å­—æ®µçš„å˜é‡
+	std::vector<Index> indexs_;//å­˜å‚¨ç´¢å¼•çš„å˜é‡
 };
 
 class Attribute
 {
 public:
-	Attribute();/*Attribute¹¹Ôìº¯Êı*/
-	~Attribute();/*AttributeÎö¹¹º¯Êı*/
-	string get_attr_name();/*»ñÈ¡±äÁ¿attribute_name_*/
-	void set_attribute_name(string name);/*ÉèÖÃ±äÁ¿attribute_name_*/
-	int get_attr_type();/*»ñÈ¡±äÁ¿attribute_type_*/
-	void set_attribute_type(int type);/*ÉèÖÃattribute_type_*/
-	int get_data_type();/*»ñÈ¡±äÁ¿data_type_*/
-	void set_data_type(int type);/*ÉèÖÃ±äÁ¿data_type_*/
-	int get_length();/*»ñÈ¡±äÁ¿length_*/
-	void set_length(int length);/*ÉèÖÃ±äÁ¿length_*/
+	Attribute();/*Attributeæ„é€ å‡½æ•°*/
+	~Attribute();/*Attributeææ„å‡½æ•°*/
+	string get_attr_name();/*è·å–å˜é‡attribute_name_*/
+	void set_attribute_name(string name);/*è®¾ç½®å˜é‡attribute_name_*/
+	int get_attr_type();/*è·å–å˜é‡attribute_type_*/
+	void set_attribute_type(int type);/*è®¾ç½®attribute_type_*/
+	int get_data_type();/*è·å–å˜é‡data_type_*/
+	void set_data_type(int type);/*è®¾ç½®å˜é‡data_type_*/
+	int get_length();/*è·å–å˜é‡length_*/
+	void set_length(int length);/*è®¾ç½®å˜é‡length_*/
 private:
-	friend class boost::serialization::access;/*ÓÑÔªº¯Êı¡£ÎªÁËÄÜÈÃ´®ĞĞ»¯Àà¿âÄÜ¹»·ÃÎÊË½ÓĞ³ÉÔ±£¬ËùÒÔÒªÉùÃ÷Ò»¸öÓÑÔªÀà*/
-	template<class Archive>/*´®ĞĞ»¯µÄº¯Êı£¬ÕâÒ»¸öº¯ÊıÍê³É¶ÔÏóµÄ±£´æÓë»Ö¸´*/
+	friend class boost::serialization::access;/*å‹å…ƒå‡½æ•°ã€‚ä¸ºäº†èƒ½è®©ä¸²è¡ŒåŒ–ç±»åº“èƒ½å¤Ÿè®¿é—®ç§æœ‰æˆå‘˜ï¼Œæ‰€ä»¥è¦å£°æ˜ä¸€ä¸ªå‹å…ƒç±»*/
+	template<class Archive>/*ä¸²è¡ŒåŒ–çš„å‡½æ•°ï¼Œè¿™ä¸€ä¸ªå‡½æ•°å®Œæˆå¯¹è±¡çš„ä¿å­˜ä¸æ¢å¤*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & attribute_name_;
@@ -140,31 +140,31 @@ private:
 		ar & length_;
 		ar & attribute_type_;
 	}
-	string attribute_name_;//´æ´¢×Ö¶ÎÃûµÄ±äÁ¿
-	int attribute_type_;//´æ´¢×Ö¶ÎÀàĞÍµÄ±äÁ¿
-	int data_type_;//´æ´¢Êı¾İÀàĞÍµÄ±äÁ¿
-	int length_;//´æ´¢¸Ã×Ö¶Î³¤¶ÈµÄ³¤¶È
+	string attribute_name_;//å­˜å‚¨å­—æ®µåçš„å˜é‡
+	int attribute_type_;//ç”¨äºæ ‡è¯†æ˜¯å¦ä¸ºä¸»é”®
+	int data_type_;//å­˜å‚¨æ•°æ®ç±»å‹çš„å˜é‡
+	int length_;//å­˜å‚¨è¯¥å­—æ®µé•¿åº¦çš„é•¿åº¦
 };
 
 class Index {
 public:
-	Index();/*Index¹¹Ôìº¯Êı*/
-	Index(std::string name, std::string attr_name, int keytype, int keylen, int rank);/*Index´ø²ÎÊı¹¹Ôìº¯Êı*/
-	string get_attr_name();/*»ñÈ¡±äÁ¿attribute_name_*/
-	string get_name();/*»ñÈ¡±äÁ¿name_*/
-	int get_key_len();/*»ñÈ¡±äÁ¿key_length_*/
-	int get_key_type();/*»ñÈ¡±äÁ¿key_type_*/
-	int get_rank();/*»ñÈ¡±äÁ¿rank_*/
-	int get_root();/*»ñÈ¡±äÁ¿root_*/
-	void set_root(int root);/*ÉèÖÃ±äÁ¿root_*/
-	int get_leaf_head();/*»ñÈ¡±äÁ¿leaf_head_*/
-	void set_leaf_head(int leaf_head);/*ÉèÖÃ±äÁ¿leaf_head_*/
-	int get_key_count();/*»ñÈ¡±äÁ¿key_count_*/
-	void set_key_count(int key_count);/*ÉèÖÃ±äÁ¿key_count_*/
-	int get_level();/*»ñÈ¡±äÁ¿level_*/
-	void set_level(int level);/*ÉèÖÃ±äÁ¿level_*/
-	int get_node_count();/*»ñÈ¡±äÁ¿node_count_*/
-	void set_node_count(int node_count);/*ÉèÖÃ±äÁ¿node_count_*/
+	Index();/*Indexæ„é€ å‡½æ•°*/
+	Index(std::string name, std::string attr_name, int keytype, int keylen, int rank);/*Indexå¸¦å‚æ•°æ„é€ å‡½æ•°*/
+	string get_attr_name();/*è·å–å˜é‡attribute_name_*/
+	string get_name();/*è·å–å˜é‡name_*/
+	int get_key_len();/*è·å–å˜é‡key_length_*/
+	int get_key_type();/*è·å–å˜é‡key_type_*/
+	int get_rank();/*è·å–å˜é‡rank_*/
+	int get_root();/*è·å–å˜é‡root_*/
+	void set_root(int root);/*è®¾ç½®å˜é‡root_*/
+	int get_leaf_head();/*è·å–å˜é‡leaf_head_*/
+	void set_leaf_head(int leaf_head);/*è®¾ç½®å˜é‡leaf_head_*/
+	int get_key_count();/*è·å–å˜é‡key_count_*/
+	void set_key_count(int key_count);/*è®¾ç½®å˜é‡key_count_*/
+	int get_level();/*è·å–å˜é‡level_*/
+	void set_level(int level);/*è®¾ç½®å˜é‡level_*/
+	int get_node_count();/*è·å–å˜é‡node_count_*/
+	void set_node_count(int node_count);/*è®¾ç½®å˜é‡node_count_*/
 
 	int IncreaseMaxCount();/*max_count_++*/
 	int IncreaseKeyCount();/*key_count_++*/
@@ -174,8 +174,8 @@ public:
 	int DecreaseNodeCount();/*node_count--*/
 	int DecreaseLevel();/*level--*/
 private:
-	friend class boost::serialization::access;/*ÓÑÔªº¯Êı¡£ÎªÁËÄÜÈÃ´®ĞĞ»¯Àà¿âÄÜ¹»·ÃÎÊË½ÓĞ³ÉÔ±£¬ËùÒÔÒªÉùÃ÷Ò»¸öÓÑÔªÀà*/
-	template<class Archive>/*´®ĞĞ»¯µÄº¯Êı£¬ÕâÒ»¸öº¯ÊıÍê³É¶ÔÏóµÄ±£´æÓë»Ö¸´*/
+	friend class boost::serialization::access;/*å‹å…ƒå‡½æ•°ã€‚ä¸ºäº†èƒ½è®©ä¸²è¡ŒåŒ–ç±»åº“èƒ½å¤Ÿè®¿é—®ç§æœ‰æˆå‘˜ï¼Œæ‰€ä»¥è¦å£°æ˜ä¸€ä¸ªå‹å…ƒç±»*/
+	template<class Archive>/*ä¸²è¡ŒåŒ–çš„å‡½æ•°ï¼Œè¿™ä¸€ä¸ªå‡½æ•°å®Œæˆå¯¹è±¡çš„ä¿å­˜ä¸æ¢å¤*/
 	void serialize(Archive & ar, const unsigned int version)
 	{
 		ar & max_count_;
@@ -191,18 +191,18 @@ private:
 		ar & level_;
 		ar & node_count_;
 	}
-	int max_count_;//´æ´¢Êı¾İ×î´óÖµµÄ±äÁ¿
-	int key_length_;//´æ´¢Ö÷¼ü³¤¶ÈµÄ±äÁ¿
-	int key_type_;//´æ´¢Ö÷¼üÀàĞÍµÄ±äÁ¿
+	int max_count_;//å­˜å‚¨æ•°æ®æœ€å¤§å€¼çš„å˜é‡
+	int key_length_;//å­˜å‚¨ä¸»é”®é•¿åº¦çš„å˜é‡
+	int key_type_;//å­˜å‚¨ä¸»é”®ç±»å‹çš„å˜é‡
 	int rank_;
 	int rubbish_;
 	int root_;
-	int leaf_head_;/*Ò¶×Ó½ÚµãµÄÍ·²¿*/
+	int leaf_head_;
 	int key_count_;
 	int level_;
 	int node_count_;
-	string attribute_name_;//´æ´¢×Ö¶ÎÃûµÄ±äÁ¿
-	string name_;//´æ´¢Ë÷ÒıÃûµÄ±äÁ¿
+	string attribute_name_;//å­˜å‚¨å­—æ®µåçš„å˜é‡
+	string name_;//å­˜å‚¨ç´¢å¼•åçš„å˜é‡
 };
 
 #endif
