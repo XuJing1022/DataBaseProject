@@ -1,8 +1,8 @@
 #pragma once
 #pragma region 
-//¼ò½é£º²éÑ¯½âÎöÆ÷
+//ç®€ä»‹ï¼šæŸ¥è¯¢è§£æå™¨
 //Implemented by Jin Xin
-//×÷ÓÃ£º¸ºÔğ½âÎöÓÃ»§ÊäÈëµÄ²éÑ¯Óï¾ä²¢µ÷ÓÃ¶ÔÓ¦µÄAPIÀàÀïµÄº¯Êı
+//ä½œç”¨ï¼šè´Ÿè´£è§£æç”¨æˆ·è¾“å…¥çš„æŸ¥è¯¢è¯­å¥å¹¶è°ƒç”¨å¯¹åº”çš„APIç±»é‡Œçš„å‡½æ•°
 #pragma endregion
 
 #ifndef _QUERYPARSER_H_
@@ -16,17 +16,17 @@ using namespace std;
 class  QueryParser
 {
 public:
-	QueryParser();/*QueryParser¹¹Ôìº¯Êı*/
-	~QueryParser();/*QueryParserµÄÎö¹¹º¯Êı*/
-	void ExecuteSQL(string sql);/*¶ÔÍâ½Ó¿Ú£¬¸ù¾İsqlÀ´Ö´ĞĞÏàÓ¦µÄ²Ù×÷*/
+	 QueryParser();/*QueryParseræ„é€ å‡½æ•°*/
+	~ QueryParser();/*QueryParserçš„ææ„å‡½æ•°*/
+	void ExecuteSQL(string sql);/*å¯¹å¤–æ¥å£ï¼Œæ ¹æ®sqlæ¥æ‰§è¡Œç›¸åº”çš„æ“ä½œ*/
 private:
 	API* api;
 	string sql_;
 	vector<string> sql_vector_;
-	vector<string> SplitSQL(string sql, string seg);/*²ğ·ÖsqlÓï¾ä£¬½«Ã¿¸öµ¥´Ê·ÅÈëvectorÖĞ*/
+	vector<string> SplitSQL(string sql, string seg);/*æ‹†åˆ†sqlè¯­å¥ï¼Œå°†æ¯ä¸ªå•è¯æ”¾å…¥vectorä¸­*/
 	int sql_type_;
-	void FormateSQL();/*¹æ·¶»¯ÓÃ»§ÊäÈëµÄsql£¬±ãÓÚºóĞø²ğ·Ö*/
-	void GetSqlType();/*»ñÈ¡sqlÓï¾äµÄÀàĞÍ*/
-	void InvokeAPI();/*¸ù¾İsqlÀàĞÍµ÷ÓÃ¶ÔÓ¦µÄapi*/
+	void FormateSQL();/*è§„èŒƒåŒ–ç”¨æˆ·è¾“å…¥çš„sqlï¼Œä¾¿äºåç»­æ‹†åˆ†*/
+	void GetSqlType();/*è·å–sqlè¯­å¥çš„ç±»å‹*/
+	void InvokeAPI();/*æ ¹æ®sqlç±»å‹è°ƒç”¨å¯¹åº”çš„api*/
 };
 #endif // !_QUERYPARSER_H_
