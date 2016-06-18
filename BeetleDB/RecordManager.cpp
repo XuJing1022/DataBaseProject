@@ -21,6 +21,15 @@ string RecordManager::intToString(int x)
 	return s;
 }
 
+string RecordManager::floatToString(float x)
+{
+	char t[1000];
+	string s;
+	sprintf(t, "%f", x);
+	s = t;
+	return s;
+}
+
 void RecordManager::Insert(SQLInsert& st)
 {
 	string tb_name = st.get_tb_name();
@@ -229,6 +238,187 @@ void RecordManager::Insert(SQLInsert& st)
 
 vector<vector<TKey>> RecordManager::Select(SQLSelect& st)
 {
+	string searchType = "普通查询";
+	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
+
+	//筛选的字段的下标集合
+	vector<int> attribute_loc;
+	vector<vector<TKey> > tuples;
+	vector<vector<TKey>>result;
+
+	for (auto i = st.get_select_attribute().begin(); i != st.get_select_attribute().end(); i++)
+	{
+		bool exits = false;
+		int loc = 0;
+		//遍历查询的字段名
+		for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++, loc++)
+		{
+
+			if (*i == "*" || attr->get_attr_name() == *i)
+			{
+				attribute_loc.push_back(loc);
+				exits = true;
+				if (*i != "*")
+				{
+					break;
+				}
+			}
+		}
+		if (exits == false)
+		{
+			cout << "查询的字段名在该表中不存在！" << endl;
+			return result;
+		}
+	}
+
+	bool has_index = false;
+	int index_idx;
+	int where_idx;
+
+	//如果有index,看看index是否作用于查询的属性列上
+	if (tb->GetIndexNum() != 0)
+	{
+		for (auto i = 0; i < tb->GetIndexNum(); i++)
+		{
+			Index *idx = tb->GetIndex(i);
+			for (auto j = 0; j < st.GetWheres().size(); j++)
+			{
+				//to be modified
+				if (idx->get_attr_name() == st.GetWheres()[j].key_1 && st.GetWheres()[j].op_type != SIGN_NE)//xj:forB+tree,pre:== SIGN_EQ
+				{
+					has_index = true;
+					index_idx = i;
+					where_idx = j;
+				}
+			}
+		}
+	}
+	//如果查询的列没有index,则遍历所有block
+	if (!has_index)
+	{
+		int block_num = tb->get_first_block_num();
+		for (int i = 0; i < tb->get_block_count(); i++)
+		{
+			BlockInfo *bp = GetBlockInfo(tb, block_num);
+			for (int j = 0; j < bp->GetRecordCount(); j++)
+			{
+				vector<TKey> tuple = GetRecord(tb, block_num, j);
+				bool sats = true;
+				for (auto k = 0; k < st.GetWheres().size(); k++)
+				{
+					SQLWhere where = st.GetWheres()[k];
+					if (!SatisfyWhere(tb, tuple, where)) sats = false;
+				}
+				if (sats) tuples.push_back(tuple);
+			}
+			block_num = bp->GetNextBlockNum();
+		}
+	}
+	//如果index作用于该列，则用B+树进行搜索
+	else
+	{
+		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
+
+		//为tkey建索引
+		int type = tb->GetIndex(index_idx)->get_key_type();
+		int length = tb->GetIndex(index_idx)->get_key_len();
+		string value = st.GetWheres()[where_idx].value;
+		TKey dest_key(type, length);
+		dest_key.ReadValue(value);
+
+		//xujing:单值查询与范围查询 分支
+		vector<int> blocknumList = tree.GetVal(dest_key, st.GetWheres()[where_idx].op_type, searchType);
+		//int blocknum = tree.GetVal(dest_key);
+		//得到查询结果集合
+		for (auto bnum = blocknumList.begin(); bnum != blocknumList.end(); bnum++) 
+		{
+			int blocknum = (*bnum);
+			if (blocknum != -1)
+			{
+				int blockoffset = blocknum;
+				//取高16位，即前2个字节，代表块号
+				blocknum = blocknum >> 16;
+				//取低16位，即后两个字节，代表块内偏移量
+				blocknum = blocknum && 0xffff;
+				//拿到根据块号和块内位移拿到第blockoffset个tuple
+				blockoffset = blockoffset & 0xffff;
+
+				vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
+				bool sats = true;
+				for (auto k = 0; k < st.GetWheres().size(); k++)
+				{
+					SQLWhere where = st.GetWheres()[k];
+					if (!SatisfyWhere(tb, tuple, where)) sats = false;
+				}
+				if (sats) tuples.push_back(tuple);
+			}
+		}
+	}
+	if (tuples.size() == 0)
+	{
+		cout << "空表（Empty table）" << endl;
+		return result;
+	}
+	//打印属性名
+	string sline = "";
+	for (int i = 0; i < attribute_loc.size(); i++)
+	{
+		cout << "+----------";
+		sline += "+----------";
+	}
+	cout << "+" << endl;
+	sline += "+";
+
+	for (int i = 0; i<attribute_loc.size(); i++)
+	{
+		cout << "| " << setw(9) << left << tb->GetAttributes()[attribute_loc[i]].get_attr_name();
+	}
+	cout << "|" << endl;
+	cout << sline << endl;
+
+	//xujing:聚集函数使用
+	int index = 2;//1:第2列属性
+				  //TKey min = Min(tuples, index);//testMin
+				  //TKey min = Max(tuples, index);//testMax
+				  //TKey* min = Avg(tuples, index);//testAvg:varchar时返回key_=“”
+	int min = Count(tuples, index);//testCount
+								   //
+
+								   //打印结果
+	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++)
+	{
+		vector<TKey> reuslt_tuple;
+		for (int i = 0; i < attribute_loc.size(); i++)
+		{
+			//只打印选择的字段
+			auto val = tuple->begin() + attribute_loc[i];
+			reuslt_tuple.push_back(*val);
+			cout << "| " << setw(10) << (*val);
+		}
+
+		result.push_back(reuslt_tuple);
+		cout << "|" << endl;
+		cout << sline << endl;
+	}
+
+	//xujing:聚集函数测试输出
+	cout << "| Result | " << setw(10) << min;//(*min);
+
+	cout << "| 查询方式 | " << setw(10) << searchType << endl;
+	
+	//索引打印测试
+	/*if (tb->GetIndexNum() != 0)
+	{
+	BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
+	tree.Print();
+	}*/
+	return result;
+}
+
+
+/*
+vector<vector<TKey>> RecordManager::Select(SQLSelect& st)
+{
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
 	//筛选的字段的下标集合
 	vector<int> attribute_loc;
@@ -384,155 +574,8 @@ vector<vector<TKey>> RecordManager::Select(SQLSelect& st)
 	}
 	return result;
 }
+*/
 
-/*void RecordManager::Select(SQLSelect& st)
-{
-	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
-	//筛选的字段的下标集合
-	vector<int> attribute_loc;
-	//遍历查询的字段名
-	for (auto i = st.get_select_attribute().begin(); i != st.get_select_attribute().end(); i++)
-	{
-		bool exits = false;
-		int loc = 0;
-		//遍历该表的字段，如果遇到和要查询的字段名一样的字段，则把该表第loc个字段放到attribute_loc中
-		for (auto attr = tb->GetAttributes().begin(); attr != tb->GetAttributes().end(); attr++, loc++)
-		{
-			if (*i == "*" || attr->get_attr_name() == *i)
-			{
-				attribute_loc.push_back(loc);
-				exits = true;
-				if (*i != "*")
-				{
-					break;
-				}
-			}
-		}
-		if (exits == false)
-		{
-			cout << "查询的字段名在该表中不存在！"<<endl;
-			return;
-		}
-	}
-
-	vector<vector<TKey> > tuples; 
-	bool has_index = false;
-	int index_idx;
-	int where_idx;
-
-	//如果有index,看看index是否作用于查询的属性列上
-	if (tb->GetIndexNum() != 0)
-	{
-		for (auto i = 0; i < tb->GetIndexNum(); i++)
-		{
-			Index *idx = tb->GetIndex(i);
-			for (auto j = 0; j < st.GetWheres().size(); j++)
-			{
-				if (idx->get_attr_name() == st.GetWheres()[j].key_1 && st.GetWheres()[j].op_type == SIGN_EQ)
-				{
-					has_index = true;
-					index_idx = i;
-					where_idx = j;
-				}
-			}
-		}
-	}
-	//如果查询的列没有index,则遍历所有block
-	if (!has_index)
-	{
-		int block_num = tb->get_first_block_num();
-		for (int i = 0; i < tb->get_block_count(); i++)
-		{
-			BlockInfo *bp = GetBlockInfo(tb, block_num);
-			for (int j = 0; j < bp->GetRecordCount(); j++)
-			{
-				vector<TKey> tuple = GetRecord(tb, block_num, j);
-				bool sats = true;
-				for (auto k = 0; k < st.GetWheres().size(); k++)
-				{
-					SQLWhere where = st.GetWheres()[k];
-					if (!SatisfyWhere(tb, tuple, where)) sats = false;
-				}
-				if (sats) tuples.push_back(tuple);
-			}
-			block_num = bp->GetNextBlockNum();
-		}
-	}
-	//如果index作用于该列，则用B+树进行搜索
-	else 
-	{
-		BPlusTree tree(tb->GetIndex(index_idx), buffer_m_, catalog_m_, db_name_);
-
-		//为tkey建索引
-		int type = tb->GetIndex(index_idx)->get_key_type();
-		int length = tb->GetIndex(index_idx)->get_key_len();
-		string value = st.GetWheres()[where_idx].value;
-		TKey dest_key(type, length);
-		dest_key.ReadValue(value);
-
-		int blocknum = tree.GetVal(dest_key);
-
-		if (blocknum != -1)
-		{
-			int blockoffset = blocknum;
-			//取高16位，即前2个字节，代表块号
-			blocknum = blocknum >> 16;
-			//取低16位，即后两个字节，代表块内偏移量
-			blocknum = blocknum && 0xffff;
-			//拿到根据块号和块内位移拿到第blockoffset个tuple
-			blockoffset = blockoffset & 0xffff;
-
-			vector<TKey> tuple = GetRecord(tb, blocknum, blockoffset);
-			bool sats = true;
-			for (auto k = 0; k < st.GetWheres().size(); k++)
-			{
-				SQLWhere where = st.GetWheres()[k];
-				if (!SatisfyWhere(tb, tuple, where)) sats = false;
-			}
-			if (sats) tuples.push_back(tuple);
-		}
-	}
-	if (tuples.size() == 0)
-	{
-		cout << "空表（Empty table）!"<<endl;
-		return;
-	}
-	//打印属性名
-	string sline = "";
-	for (int i = 0; i < attribute_loc.size(); i++)
-	{
-		cout << "+----------";
-		sline += "+----------";
-	}
-	cout << "+" << endl;
-	sline += "+";
-
-	for (int i = 0; i<attribute_loc.size(); i++)
-	{
-		cout << "| " << setw(9) << left << tb->GetAttributes()[attribute_loc[i]].get_attr_name();
-	}
-	cout << "|" << endl;
-	cout << sline << endl;
-	//打印结果
-	for (auto tuple = tuples.begin(); tuple != tuples.end(); tuple++)
-	{
-		for (int i = 0; i < attribute_loc.size(); i++)
-		{
-			//只打印选择的字段
-			auto val = tuple->begin() + attribute_loc[i];
-			cout << "| " << setw(10) << (*val);
-		}
-		cout << "|" << endl;
-		cout << sline << endl;
-	}
-
-	//打印B+树
-	if (tb->GetIndexNum() != 0)
-	{
-		BPlusTree tree(tb->GetIndex(0), buffer_m_, catalog_m_, db_name_);
-		tree.Print();
-	}
-}*/
 //Join查询实现
 void RecordManager::JoinSelect(SQLJoinSelect & st)
 {
@@ -565,7 +608,10 @@ void RecordManager::JoinSelect(SQLJoinSelect & st)
 	vector<string> attribute_names;
 	//新表的字段类型集合
 	vector<string> attr_types;
-
+	//新表的tuple集合
+	vector<vector<string>> new_tuples;
+	//join之前表的集合
+	vector<Table> old_tables;
 	//遍历所有表中表的属性，从而创建一张大表
 	for (int i = 0; i < table_count; i++)
 	{
@@ -583,6 +629,7 @@ void RecordManager::JoinSelect(SQLJoinSelect & st)
 				attr_types.push_back("varchar(" + intToString(it->get_length()) + ")");
 			}
 		}
+		old_tables.push_back((*tb));
 	}
 	string table_name_afer_join = "JOINED_TABLE";
 	QueryParser query_parser;
@@ -600,9 +647,114 @@ void RecordManager::JoinSelect(SQLJoinSelect & st)
 
 	//catalog_m_->WriteArchiveFile();此句切不可加！因为上一句已经更新了catalog.现在写的话会覆盖更新的内容！
 	catalog_m_->ReadArchiveFile();//只需把更新后的目录读出来即可
-	//接下来插入数据到新表中，之后对新表执行select，所以要做到属性A=属性B,to be continued...
+	
+								  //接下来插入数据到新表中，之后对新表执行select，所以要做到属性A=属性B,to be continued...
+	int i = 0;
+	if(old_tables.size()==2)
+	{
+		/*vector<vector<TKey>> vt1=Select((*seleAll));*/
+		//第一张表的Tuples
+		vector<vector<TKey>> vt1;
+		int block_num_1 = old_tables[i].get_first_block_num();
+		for (int x = 0; x <old_tables[i].get_block_count(); x++)
+		{
+			BlockInfo *bp = GetBlockInfo(&old_tables[i], block_num_1);
+			for (int j = 0; j < bp->GetRecordCount(); j++)
+			{
+				vector<TKey> tuple = GetRecord(&old_tables[i], block_num_1, j);
+				vt1.push_back(tuple);
+			}
+			block_num_1 = bp->GetNextBlockNum();
+		}
 
+		//第二张表的Tuples
+		vector<vector<TKey>> vt2;
+		int block_num_2 = old_tables[i+1].get_first_block_num();
+		for (int x = 0; x <old_tables[i+1].get_block_count(); x++)
+		{
+			BlockInfo *bp = GetBlockInfo(&old_tables[i+1], block_num_2);
+			for (int j = 0; j < bp->GetRecordCount(); j++)
+			{
+				vector<TKey> tuple = GetRecord(&old_tables[i+1], block_num_2, j);
+				vt2.push_back(tuple);
+			}
+			block_num_2 = bp->GetNextBlockNum();
+		}
+		int p = vt1.size();
+		string tmp;
+		for (int j = 0; j < p; j++)
+		{//第一张表的行
+			vector<TKey> tmp_key = vt1[j];
+			tmp = "";
+			for (int k = 0; k < tmp_key.size(); k++)
+			{//第一张表的列
+				if (tmp_key[k].get_key_type() == T_INT)
+				{
+					int a;
+					memcpy(&a, tmp_key[k].get_key(), tmp_key[k].get_length());
+					tmp += intToString(a) + ",";
+				}
+				else if (tmp_key[k].get_key_type() == T_FLOAT)
+				{
+					float a;
+					memcpy(&a, tmp_key[k].get_key(), tmp_key[k].get_length());
+					string copy = floatToString(a);
+					tmp += copy + ",";
+				}
+				else//T_CHAR
+				{
+					string copy(tmp_key[k].get_key());
+					copy = "'" + copy + "'";
+					tmp += copy + ",";
+				}
+			}
+			string tmp_1 = tmp;
+			int q = vt2.size();
+			for (int y = 0; y < q; y++)
+			{//第二张表的行
+				tmp_1 = tmp;
+				vector<TKey> tmp_key_1 = vt2[y];
+				for (int k = 0; k < tmp_key_1.size(); k++)
+				{//第二张表的列
+					if (tmp_key_1[k].get_key_type() == T_INT)
+					{
+						int a;
+						memcpy(&a, tmp_key_1[k].get_key(), tmp_key_1[k].get_length());
+						if (k == (tmp_key_1.size() - 1))
+							tmp_1 += intToString(a);
+						else
+							tmp_1 += intToString(a) + ",";
+					}
+					else if (tmp_key_1[k].get_key_type() == T_FLOAT)
+					{
+						float a;
+						memcpy(&a, tmp_key_1[k].get_key(), tmp_key_1[k].get_length());
+						string copy = floatToString(a);
+						if (k == (tmp_key_1.size() - 1))
+							tmp_1 += copy;
+						else
+							tmp_1 += copy + ",";
+					}
+					else//T_CHAR
+					{
+						string copy(tmp_key_1[k].get_key());
+						copy = "'" + copy + "'";
+						if (k == (tmp_key_1.size() - 1))
+							tmp_1 += copy;
+						else
+							tmp_1 += copy + ",";
+					}
+				}
+				string insertStatement = "insert into JOINED_TABLE values(" + tmp_1 + ")";
+				query_parser.ExecuteSQL(insertStatement);
+				catalog_m_->ReadArchiveFile();
+			}
+		}
+	}
+	//接下来就是select 属性，返回结果后，将JOIEND_TABLE删除即可
 }
+
+
 void RecordManager::Delete(SQLDelete& st)
 {
 	Table *tb = catalog_m_->GetDB(db_name_)->GetTable(st.get_tb_name());
@@ -932,6 +1084,7 @@ bool RecordManager::SatisfyWhere(Table* tbl, vector<TKey> keys, SQLWhere where)
 	}
 }
 
+
 /**********************                  聚集函数实现                      ********************************/
 /*由于tuple中并没有表头信息，所以sql解析聚集运算时，需解析聚集对象是表的第几列：index*/
 TKey RecordManager::Min(vector<vector<TKey> > tuples, int MinIndex) {
@@ -979,7 +1132,7 @@ TKey RecordManager::Max(vector<vector<TKey> > tuples, int MaxIndex) {
 }
 
 //由于没有Group By 所以对属性的count直接等价于tuple的count。Index暂时没用
-int RecordManager::Count(vector<TKey> tuples, int Index) {
+int RecordManager::Count(vector<vector<TKey> > tuples, int Index) {
 	return tuples.size();
 }
 
@@ -998,12 +1151,11 @@ TKey* RecordManager::Avg(vector<vector<TKey> > tuples, int MinIndex) {
 					temp = new TKey(*(val));
 				}
 				else
-				{//操作符重载(*temp) += (*val);
-				}
+					(*temp) += (*val);
 			}
 		}
 	}
 	if (temp != nullptr)
-		//操作符重载(*temp) /= j;
+		(*temp) /= j;
 	return (temp);
 }
