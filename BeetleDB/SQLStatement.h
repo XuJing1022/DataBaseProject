@@ -1,4 +1,4 @@
-//Implemented by Jin Xin
+//Implemented by Jin Xin ï¼Œ SQLJoinSelect is implemented by Lai ZhengMin
 #pragma once
 #ifndef _SQLSTATEMENT_H_
 #define _SQLSTATEMENT_H_
@@ -19,115 +19,116 @@ class Index;
 class SQL
 {
 public:
-	SQL();/*sql²»´ø²ÎÊıµÄ¹¹Ôìº¯Êı*/
-	SQL(int sql_type);/*sql´ø²ÎÊıint sql_typeµÄ¹¹Ôìº¯Êı*/
-	int get_sql_type();/*»ñÈ¡sqlÓï¾äµÄÀàĞÍ*/
-	void set_sql_type(int sql_type);/*ÉèÖÃsqlÓï¾äµÄÀàĞÍ*/
-	int ParseDataType(vector<string> sql_vector, Attribute &attribute, unsigned int pos);/*½âÎöSQLÓï¾äÖĞ×Ö¶ÎµÄÊı¾İÀàĞÍ*/
-	virtual void Parse(vector<string> sql_vector) = 0;/*Ğéº¯ÊıÒªÇó¼Ì³Ğ¸ÃÀàµÄÀà½øĞĞÖØĞ´*/
+	SQL();/*sqlä¸å¸¦å‚æ•°çš„æ„é€ å‡½æ•°*/
+	SQL(int sql_type);/*sqlå¸¦å‚æ•°int sql_typeçš„æ„é€ å‡½æ•°*/
+	int get_sql_type();/*è·å–sqlè¯­å¥çš„ç±»å‹*/
+	void set_sql_type(int sql_type);/*è®¾ç½®sqlè¯­å¥çš„ç±»å‹*/
+	int ParseDataType(vector<string> sql_vector,Attribute &attribute, unsigned int pos);/*è§£æSQLè¯­å¥ä¸­å­—æ®µçš„æ•°æ®ç±»å‹*/
+	virtual void Parse(vector<string> sql_vector) = 0;/*è™šå‡½æ•°è¦æ±‚ç»§æ‰¿è¯¥ç±»çš„ç±»è¿›è¡Œé‡å†™*/
 protected:
-	int sql_type_;//sqlÓï¾äµÄÀàĞÍ
+	int sql_type_;//sqlè¯­å¥çš„ç±»å‹
 };
 #pragma endregion
 
-#pragma region class: SQLCreateDatabase ÀıÈç£ºcreate database university;
+#pragma region class: SQLCreateDatabase ä¾‹å¦‚ï¼šcreate database university;
 class SQLCreateDatabase : public SQL
 {
 public:
-	SQLCreateDatabase(vector<string> sql_vector);/*SQLCreateDatabaseµÄ¹¹Ôìº¯Êı*/
-	string get_database_name();/*»ñÈ¡databaseµÄÃû×Ö*/
-	void set_database_name(string database_name);/*ÉèÖÃdatabaseµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡databaseµÄÃû×Ö*/
+	SQLCreateDatabase(vector<string> sql_vector);/*SQLCreateDatabaseçš„æ„é€ å‡½æ•°*/
+	string get_database_name();/*è·å–databaseçš„åå­—*/
+	void set_database_name(string database_name);/*è®¾ç½®databaseçš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–databaseçš„åå­—*/
 private:
-	string database_name_;//databaseµÄÃû×Ö
+	string database_name_;//databaseçš„åå­—
 };
 #pragma endregion
 
-#pragma region class SQLCreateTable ÀıÈç£ºcreate table student (name char(100), id int, primary key(id));
+#pragma region class SQLCreateTable ä¾‹å¦‚ï¼šcreate table student (name char(100), id int, primary key(id));
 class SQLCreateTable : public SQL
 {
 public:
-	SQLCreateTable(vector<string> sql_vector);/*SQLCreateTableµÄ¹¹Ôìº¯Êı*/
-	string get_table_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	void set_table_name(string table_name);/*ÉèÖÃtableµÄÃû×Ö*/
-	vector<Attribute> get_attributes();/*»ñÈ¡tableµÄÊôĞÔ*/
-	void SetAttributes(vector<Attribute> attribute);/*ÉèÖÃtableµÄÊôĞÔ*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×Ö¡¢tableÊôĞÔ*/
+	SQLCreateTable() {};
+	SQLCreateTable(vector<string> sql_vector);/*SQLCreateTableçš„æ„é€ å‡½æ•°*/
+	string get_table_name();/*è·å–tableçš„åå­—*/
+	void set_table_name(string table_name);/*è®¾ç½®tableçš„åå­—*/
+	vector<Attribute> get_attributes();/*è·å–tableçš„å±æ€§*/
+	void SetAttributes(vector<Attribute> attribute);/*è®¾ç½®tableçš„å±æ€§*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—ã€tableå±æ€§*/
 private:
-	string table_name_;//tableµÄÃû×Ö
-	vector<Attribute> attributes_;//tableµÄÊôĞÔ
+	string table_name_;//tableçš„åå­—
+	vector<Attribute> attributes_;//tableçš„å±æ€§
 };
 #pragma endregion
 
-#pragma region class SQLCreateIndex ÀıÈç£ºcreate index i1 on student(id); 
+#pragma region class SQLCreateIndex ä¾‹å¦‚ï¼šcreate index i1 on student(id); 
 class SQLCreateIndex : public SQL
 {
 public:
-	SQLCreateIndex(vector<string> sql_vector);/*SQLCreateIndexµÄ¹¹Ôìº¯Êı*/
-	string get_tb_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	string get_index_name();/*»ñÈ¡Ë÷ÒıµÄÃû×Ö*/
-	string get_column_name();/*»ñÈ¡½¨Á¢Ë÷Òı×Ö¶ÎµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×Ö¡¢Ë÷ÒıµÄÃû×Ö¡¢½¨Á¢Ë÷Òı×Ö¶ÎµÄÃû×Ö*/
+	SQLCreateIndex(vector<string> sql_vector);/*SQLCreateIndexçš„æ„é€ å‡½æ•°*/
+	string get_tb_name();/*è·å–tableçš„åå­—*/
+	string get_index_name();/*è·å–ç´¢å¼•çš„åå­—*/
+	string get_column_name();/*è·å–å»ºç«‹ç´¢å¼•å­—æ®µçš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—ã€ç´¢å¼•çš„åå­—ã€å»ºç«‹ç´¢å¼•å­—æ®µçš„åå­—*/
 private:
-	string index_name_;//Ë÷ÒıµÄÃû×Ö
-	string table_name_;//tableµÄÃû×Ö
-	string col_name_;//½¨Á¢Ë÷Òı×Ö¶ÎµÄÃû×Ö
+	string index_name_;//ç´¢å¼•çš„åå­—
+	string table_name_;//tableçš„åå­—
+	string col_name_;//å»ºç«‹ç´¢å¼•å­—æ®µçš„åå­—
 };
 #pragma endregion
 
-#pragma region class SQLDropDatabase ÀıÈç£ºdrop database university;
+#pragma region class SQLDropDatabase ä¾‹å¦‚ï¼šdrop database university;
 class SQLDropDatabase : public SQL
 {
 public:
-	SQLDropDatabase(vector<string> sql_vector);/*SQLDropDatabaseµÄ¹¹Ôìº¯Êı*/
-	string get_database_name();/*»ñÈ¡Êı¾İ¿âµÄÃû×Ö*/
-	void set_database_name(string dbname);/*ÉèÖÃÊı¾İ¿âµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡Êı¾İ¿âÃû×Ö*/
+	SQLDropDatabase(vector<string> sql_vector);/*SQLDropDatabaseçš„æ„é€ å‡½æ•°*/
+	string get_database_name();/*è·å–æ•°æ®åº“çš„åå­—*/
+	void set_database_name(string dbname);/*è®¾ç½®æ•°æ®åº“çš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–æ•°æ®åº“åå­—*/
 private:
-	string database_name_;//Êı¾İ¿âÃû×Ö
+	string database_name_;//æ•°æ®åº“åå­—
 };
 #pragma endregion
 
-#pragma region class SQLDropTable ÀıÈç£ºdrop table student;
+#pragma region class SQLDropTable ä¾‹å¦‚ï¼šdrop table student;
 class SQLDropTable : public SQL
 {
 public:
-	SQLDropTable(vector<string> sql_vector);/*SQLDropTableµÄ¹¹Ôìº¯Êı*/
-	string get_table_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	void set_table_name(string table_name);/*ÉèÖÃtableµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×Ö*/
+	SQLDropTable(vector<string> sql_vector);/*SQLDropTableçš„æ„é€ å‡½æ•°*/
+	string get_table_name();/*è·å–tableçš„åå­—*/
+	void set_table_name(string table_name);/*è®¾ç½®tableçš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—*/
 private:
-	string table_name_;//tableµÄÃû×Ö
+	string table_name_;//tableçš„åå­—
 };
 #pragma endregion
 
-#pragma region class SQLDropIndex ÀıÈç£ºdrop index i1;
+#pragma region class SQLDropIndex ä¾‹å¦‚ï¼šdrop index i1;
 class SQLDropIndex : public SQL
 {
 public:
-	SQLDropIndex(vector<string> sql_vector);/*SQLDropIndexµÄ¹¹Ôìº¯Êı*/
-	string get_index_name();/*»ñÈ¡indexµÄÃû×Ö*/
-	void set_index_name(string  index_name);/*ÉèÖÃindexµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡indexµÄÃû×Ö*/
+	SQLDropIndex(vector<string> sql_vector);/*SQLDropIndexçš„æ„é€ å‡½æ•°*/
+	string get_index_name();/*è·å–indexçš„åå­—*/
+	void set_index_name(string  index_name);/*è®¾ç½®indexçš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–indexçš„åå­—*/
 private:
-	string index_name_;//Ë÷ÒıµÄÃû×Ö
+	string index_name_;//ç´¢å¼•çš„åå­—
 };
 #pragma endregion
 
-#pragma region class SQLUse ÀıÈç£ºuse university£º
+#pragma region class SQLUse ä¾‹å¦‚ï¼šuse universityï¼š
 class SQLUse : public SQL
 {
 public:
-	SQLUse(vector<string> sql_vector);/*SQLUseµÄ¹¹Ôìº¯Êı*/
-	string get_database_name();/*»ñÈ¡Êı¾İ¿âµÄÃû×Ö*/
-	void set_database_name(string database_name);/*ÉèÖÃÊı¾İ¿âµÄÃû×Ö*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡Êı¾İ¿âµÄÃû×Ö*/
+	SQLUse(vector<string> sql_vector);/*SQLUseçš„æ„é€ å‡½æ•°*/
+	string get_database_name();/*è·å–æ•°æ®åº“çš„åå­—*/
+	void set_database_name(string database_name);/*è®¾ç½®æ•°æ®åº“çš„åå­—*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–æ•°æ®åº“çš„åå­—*/
 private:
-	string database_name_;//Êı¾İ¿âµÄÃû×Ö
+	string database_name_;//æ•°æ®åº“çš„åå­—
 };
 #pragma endregion
 
-#pragma region struct SQLValue ÀıÈç£ºname|Tom °üÀ¨×Ö¶ÎÃûºÍ×Ö¶ÎÖµ
+#pragma region struct SQLValue ä¾‹å¦‚ï¼šname|Tom åŒ…æ‹¬å­—æ®µåå’Œå­—æ®µå€¼
 typedef	struct
 {
 	int data_type;
@@ -135,99 +136,23 @@ typedef	struct
 }SQLValue;
 #pragma endregion
 
-#pragma region struct SQLWhere ÀıÈç where name='Tom'
+#pragma region struct SQLWhere ä¾‹å¦‚ where name='Tom' æˆ– where t1.name=t2.name
 typedef struct
 {
 	int op_type;
-	string key;
+	string key_1;
 	string value;
+	string key_2;
 }SQLWhere;
 #pragma endregion
 
-#pragma region struct SQLKeyValue ÀıÈç set name='Tom'
+#pragma region struct SQLKeyValue ä¾‹å¦‚ set name='Tom'
 typedef struct
 {
 	string key;
 	string value;
 }SQLKeyValue;
 #pragma endregion
-
-
-#pragma region class SQLInsert ÀıÈç£º insert into student values('Tom',1);
-class SQLInsert : public SQL
-{
-public:
-	SQLInsert(vector<string> sql_vector);/*SQLInsertµÄ¹¹Ôìº¯Êı*/
-	string get_tb_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	vector<SQLValue>& GetValues();  /*»ñÈ¡SQLValueµÄÖµ*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLValueµÄÖµ*/
-private:
-	string table_name_;//table µÄÃû×Ö
-	vector<SQLValue> values_;//SQLValueµÄÖµ valueµÄÖµ
-};
-#pragma endregion
-
-#pragma region class SQLSelect ÀıÈç£ºselect name from student where name = 'Tom';
-class SQLSelect : public SQL
-{
-public:
-	SQLSelect(vector<string> sql_vector);/*SQLSelectµÄ¹¹Ôìº¯Êı*/
-	string get_tb_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	vector<SQLWhere>& GetWheres();/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµ*/
-	vector<string>&  get_select_attribute();/*»ñÈ¡±äÁ¿select_attribute_*/
-private:
-	string table_name_;//tableµÄÃû×Ö
-	vector<SQLWhere> wheres_;//SQLWhereµÄÖµ¼´where²éÑ¯Ìõ¼ş
-	vector<string> select_attribute_;//´æ´¢Òª²éÑ¯µÄ×Ö¶ÎµÄ±äÁ¿
-};
-#pragma endregion
-
-#pragma region class SQLJoinSelect ÀıÈç£ºselect name from student join takes where name ='Tom';
-class SQLJoinSelect :public SQL
-{
-public:
-	SQLJoinSelect(vector<string>sql_vector);
-	vector<string> get_table_names();
-	vector<SQLWhere>& get_wheres();
-	void Parse(vector<string>sql_vector);
-private:
-	vector<string> table_names_;
-	vector<SQLWhere> wheres_;
-};
-#pragma endregion
-
-#pragma region class SQLDelete ÀıÈç£ºdelete from student where name='Tom';
-class SQLDelete : public SQL
-{
-public:
-	SQLDelete(vector<string> sql_vector);/*SQLDeleteµÄ¹¹Ôìº¯Êı*/
-	string get_tb_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	vector<SQLWhere>& GetWheres();/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµ*/
-private:
-	string table_name_;//tableµÄÃû×Ö
-	vector<SQLWhere> wheres_;//SQLWhereµÄÖµ¼´where²éÑ¯Ìõ¼ş
-};
-#pragma endregion
-
-#pragma region class SQLUpdate ÀıÈç£ºupdate student set name ='Tim' where name='Tom';
-class SQLUpdate : public SQL
-{
-public:
-	SQLUpdate(vector<string> sql_vector);/*SQLUpdateµÄ¹¹Ôìº¯Êı*/
-	string get_tb_name();/*»ñÈ¡tableµÄÃû×Ö*/
-	vector<SQLWhere>& GetWheres();/*»ñÈ¡SQLWhereµÄÖµ¼´²éÑ¯Ìõ¼ş*/
-	vector<SQLKeyValue>& GetKeyValues();/*»ñÈ¡SQLKeyValueµÄÖµ¼´¸üĞÂ×Ö¶Î*/
-	void Parse(vector<string> sql_vector);/*½âÎösql»ñÈ¡tableµÄÃû×ÖºÍSQLWhereµÄÖµºÍSQLKeyValueµÄÖµ*/
-private:
-	string table_name_;//tableµÄÃû×Ö
-	vector<SQLWhere> wheres_;//SQLWhereµÄÖµ¼´where²éÑ¯Ìõ¼ş
-	vector<SQLKeyValue> keyvalues_;//SQLKeyValueµÄÖµ¼´setµÄ×Ö¶ÎÓëÖµ
-};
-#pragma endregion
-
-#endif // !_SQLSTATEMENT_H_
 
 class TKey
 {
@@ -249,14 +174,86 @@ public:
 	bool operator>=(const TKey t1);
 	bool operator==(const TKey t1);
 	bool operator!=(const TKey t1);
-
-	//xj0616 FOR aggregation
-	TKey* operator+=(const TKey t1);
-	TKey* operator/=(const TKey t1);
-	TKey* TKey::operator/=(const int t1);
-
 private:
 	int key_type_;
 	char *key_;
 	int length_;
 };
+
+#pragma region class SQLInsert ä¾‹å¦‚ï¼š insert into student values('Tom',1);
+class SQLInsert : public SQL
+{
+public:
+	SQLInsert(vector<string> sql_vector);/*SQLInsertçš„æ„é€ å‡½æ•°*/
+	string get_tb_name();/*è·å–tableçš„åå­—*/
+	vector<SQLValue>& GetValues();  /*è·å–SQLValueçš„å€¼*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLValueçš„å€¼*/
+private:
+	string table_name_;//table çš„åå­—
+	vector<SQLValue> values_;//SQLValueçš„å€¼ valueçš„å€¼
+};
+#pragma endregion
+
+#pragma region class SQLSelect ä¾‹å¦‚ï¼šselect name from student where name = 'Tom';
+class SQLSelect : public SQL
+{
+public:
+	SQLSelect(vector<string> sql_vector);/*SQLSelectçš„æ„é€ å‡½æ•°*/
+	string get_tb_name();/*è·å–tableçš„åå­—*/
+	vector<SQLWhere>& GetWheres();/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼*/
+	vector<string>&  get_select_attribute();/*è·å–å˜é‡select_attribute_*/
+private:
+	string table_name_;//tableçš„åå­—
+	vector<SQLWhere> wheres_;//SQLWhereçš„å€¼å³whereæŸ¥è¯¢æ¡ä»¶
+	vector<string> select_attribute_;//å­˜å‚¨è¦æŸ¥è¯¢çš„å­—æ®µçš„å˜é‡
+};
+#pragma endregion
+
+#pragma region class SQLJoinSelect ä¾‹å¦‚ï¼šselect student.name from student join takes where student.name ='Tom';
+class SQLJoinSelect :public SQL
+{
+public:
+	SQLJoinSelect(vector<string>sql_vector);
+	vector<string> get_table_names();
+	vector<string> get_selected_info();
+	vector<SQLWhere>& get_wheres();
+	void Parse(vector<string>sql_vector);
+private:
+	vector<string> selected_info_;//å­˜å‚¨é€‰æ‹©çš„å±æ€§ä¿¡æ¯
+	vector<string> table_names_;
+	vector<SQLWhere> wheres_;//å­˜å‚¨æ‰€æœ‰æ¡ä»¶ä¿¡æ¯
+};
+#pragma endregion
+
+#pragma region class SQLDelete ä¾‹å¦‚ï¼šdelete from student where name='Tom';
+class SQLDelete : public SQL
+{
+public:
+	SQLDelete(vector<string> sql_vector);/*SQLDeleteçš„æ„é€ å‡½æ•°*/
+	string get_tb_name();/*è·å–tableçš„åå­—*/
+	vector<SQLWhere>& GetWheres();/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼*/
+private:
+	string table_name_;//tableçš„åå­—
+	vector<SQLWhere> wheres_;//SQLWhereçš„å€¼å³whereæŸ¥è¯¢æ¡ä»¶
+};
+#pragma endregion
+
+#pragma region class SQLUpdate ä¾‹å¦‚ï¼šupdate student set name ='Tim' where name='Tom';
+class SQLUpdate : public SQL
+{
+public:
+	SQLUpdate(vector<string> sql_vector);/*SQLUpdateçš„æ„é€ å‡½æ•°*/
+	string get_tb_name();/*è·å–tableçš„åå­—*/
+	vector<SQLWhere>& GetWheres();/*è·å–SQLWhereçš„å€¼å³æŸ¥è¯¢æ¡ä»¶*/
+	vector<SQLKeyValue>& GetKeyValues();/*è·å–SQLKeyValueçš„å€¼å³æ›´æ–°å­—æ®µ*/
+	void Parse(vector<string> sql_vector);/*è§£æsqlè·å–tableçš„åå­—å’ŒSQLWhereçš„å€¼å’ŒSQLKeyValueçš„å€¼*/
+private:
+	string table_name_;//tableçš„åå­—
+	vector<SQLWhere> wheres_;//SQLWhereçš„å€¼å³whereæŸ¥è¯¢æ¡ä»¶
+	vector<SQLKeyValue> keyvalues_;//SQLKeyValueçš„å€¼å³setçš„å­—æ®µä¸å€¼
+};
+#pragma endregion
+
+#endif // !_SQLSTATEMENT_H_
