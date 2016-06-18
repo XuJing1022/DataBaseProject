@@ -1,4 +1,5 @@
 //Implemented by Jin Xin
+#pragma once
 #include"API.h"
 #include"Exceptions.h"
 #include"RecordManager.h"
@@ -8,99 +9,99 @@
 
 using namespace std;
 
-/*API¹¹Ôìº¯Êı*/
+/*APIæ„é€ å‡½æ•°*/
 API::API(string path) :path_(path)
 {
 	catalog_manager_ = new CatalogManager(path);
 }
 
-/*APIÎö¹¹º¯Êı*/
+/*APIææ„å‡½æ•°*/
 API::~API(void)
 {
 	delete buffer_manager_;
 	delete catalog_manager_;
 }
 
-/*ÏÔÊ¾¸÷ÖÖÃüÁî*/
+/*æ˜¾ç¤ºå„ç§å‘½ä»¤*/
 void API::help()
 {
 	cout << setiosflags(ios::left) << endl;
-	cout << "ÏÂÁĞÎªÊı¾İ¿âËùÓĞ¿ÉÓÃµÄsqlÃüÁî£º" << endl;
-	cout << "×¢ÒâËùÓĞµÄÃüÁîĞèÒªÔÚÒ»ĞĞ¼üÈë£¬²¢ÒÔ';'·ÖºÅ½áÊø¡£" << endl << endl;
+	cout << "ä¸‹åˆ—ä¸ºæ•°æ®åº“æ‰€æœ‰å¯ç”¨çš„sqlå‘½ä»¤ï¼š" << endl;
+	cout << "æ³¨æ„æ‰€æœ‰çš„å‘½ä»¤éœ€è¦åœ¨ä¸€è¡Œé”®å…¥ï¼Œå¹¶ä»¥';'åˆ†å·ç»“æŸã€‚" << endl<<endl;
 	cout << "-------------------------------------------------------------" << endl;
-	cout << setw(16) << "help" << setw(2) << "|" << "ÏÔÊ¾¸Ä°ïÖú½çÃæ¡£Àı£ºhelp;" << endl;
-	cout << setw(16) << "show databases" << setw(2) << "|" << "ÏÔÊ¾ËùÓĞÊı¾İ¿â¡£Àı£ºshow databases;" << endl;
-	cout << setw(16) << "show tables" << setw(2) << "|" << "ÏÔÊ¾µ±Ç°Êı¾İ¿âÊı¾İ±í¡£Àı£ºshow tables;" << endl;
-	cout << setw(16) << "use" << setw(2) << "|" << "Ñ¡¶¨ÁíÒ»¸öÊı¾İ¿â¡£Àı£ºuse university;" << endl;
-	cout << setw(16) << "create database" << setw(2) << "|" << "´´½¨Ò»¸öÊı¾İ¿â¡£Àı£ºcreate database university;" << endl;
-	cout << setw(16) << "create table" << setw(2) << "|" << "ÔÚµ±Ç°Êı¾İ¿â´´½¨Ò»ÕÅÊı¾İ±í¡£Àı£ºcreate table student(id int,name char(20),primary key(id));" << endl;
-	cout << setw(16) << "create index" << setw(2) << "|" << "ÔÚÒ»ÕÅ±íÉÏ´´½¨Ë÷Òı¡£Àı£ºcreate index on student(id);" << endl;
-	cout << setw(16) << "drop database" << setw(2) << "|" << "É¾³ıÊı¾İ¿â¡£Àı£ºdrop database university;" << endl;
-	cout << setw(16) << "drop table" << setw(2) << "|" << "É¾³ıµ±Ç°Êı¾İ¿âµÄÒ»ÕÅÊı¾İ±í¡£Àı£ºdrop table student;" << endl;
-	cout << setw(16) << "drop index" << setw(2) << "|" << "É¾³ı±íµÄË÷Òı¡£ drop index i1;" << endl;
-	cout << setw(16) << "select" << setw(2) << "|" << "²éÑ¯Êı¾İ¡£Àı£ºselete * from student where id=1 and name='Tom';" << endl;
-	cout << setw(16) << "insert" << setw(2) << "|" << "²åÈëÊı¾İ¡£Àı£ºinsert into student values(2,'Tim');" << endl;
-	cout << setw(16) << "delete" << setw(2) << "|" << "É¾³ıÊı¾İ¡£Àı£ºdelete from student where id=2;" << endl;
-	cout << setw(16) << "update" << setw(2) << "|" << "¸üĞÂÊı¾İ¡£Àı£ºupdate student set name='Tom' where id='2';" << endl;
+	cout << setw(16) << "help" << setw(2) << "|" << "æ˜¾ç¤ºæ”¹å¸®åŠ©ç•Œé¢ã€‚ä¾‹ï¼šhelp;" << endl;
+	cout << setw(16) << "show databases" << setw(2) << "|" << "æ˜¾ç¤ºæ‰€æœ‰æ•°æ®åº“ã€‚ä¾‹ï¼šshow databases;" << endl;
+	cout << setw(16) << "show tables" << setw(2) << "|" << "æ˜¾ç¤ºå½“å‰æ•°æ®åº“æ•°æ®è¡¨ã€‚ä¾‹ï¼šshow tables;" << endl;
+	cout << setw(16) << "use" << setw(2) << "|" << "é€‰å®šå¦ä¸€ä¸ªæ•°æ®åº“ã€‚ä¾‹ï¼šuse university;" << endl;
+	cout << setw(16) << "create database" << setw(2) << "|" << "åˆ›å»ºä¸€ä¸ªæ•°æ®åº“ã€‚ä¾‹ï¼šcreate database university;" << endl;
+	cout << setw(16) << "create table" << setw(2) << "|" << "åœ¨å½“å‰æ•°æ®åº“åˆ›å»ºä¸€å¼ æ•°æ®è¡¨ã€‚ä¾‹ï¼šcreate table student(id int,name char(20),primary key(id));" << endl;
+	cout << setw(16) << "create index" << setw(2) << "|" << "åœ¨ä¸€å¼ è¡¨ä¸Šåˆ›å»ºç´¢å¼•ã€‚ä¾‹ï¼šcreate index on student(id);" << endl;
+	cout << setw(16) << "drop database" << setw(2) << "|" << "åˆ é™¤æ•°æ®åº“ã€‚ä¾‹ï¼šdrop database university;" << endl;
+	cout << setw(16) << "drop table" << setw(2) << "|" << "åˆ é™¤å½“å‰æ•°æ®åº“çš„ä¸€å¼ æ•°æ®è¡¨ã€‚ä¾‹ï¼šdrop table student;" << endl;
+	cout << setw(16) << "drop index" << setw(2) << "|" << "åˆ é™¤è¡¨çš„ç´¢å¼•ã€‚ drop index i1;" << endl;
+	cout << setw(16) << "select" << setw(2) << "|" << "æŸ¥è¯¢æ•°æ®ã€‚ä¾‹ï¼šselete * from student where id=1 and name='Tom';" << endl;
+	cout << setw(16) << "insert" << setw(2) << "|" << "æ’å…¥æ•°æ®ã€‚ä¾‹ï¼šinsert into student values(2,'Tim');" << endl;
+	cout << setw(16) << "delete" << setw(2) << "|" << "åˆ é™¤æ•°æ®ã€‚ä¾‹ï¼šdelete from student where id=2;" << endl;
+	cout << setw(16) << "update" << setw(2) << "|" << "æ›´æ–°æ•°æ®ã€‚ä¾‹ï¼šupdate student set name='Tom' where id='2';" << endl;
 	cout << "-------------------------------------------------------------" << endl;
 }
 
-/*´´½¨Êı¾İ¿â£¬µ÷ÓÃboost¿â²Ù×÷¶ÔÓ¦ÎÄ¼ş£»µ÷ÓÃcatalog ManagerÊµÏÖÊı¾İ¿â´´½¨*/
+/*åˆ›å»ºæ•°æ®åº“ï¼Œè°ƒç”¨booståº“æ“ä½œå¯¹åº”æ–‡ä»¶ï¼›è°ƒç”¨catalog Managerå®ç°æ•°æ®åº“åˆ›å»º*/
 void API::CreateDatabase(SQLCreateDatabase& sql_statement)
 {
-	cout << "´´½¨Êı¾İ¿â: " << sql_statement.get_database_name() << endl;
-	string folder_name(path_ + sql_statement.get_database_name());/*»ñÈ¡¸ÃdatabaseÓ¦¸Ã´´½¨µÄÎÄ¼şµØÖ·*/
-	boost::filesystem::path folder_path(folder_name);/*¡¾file system¡¿ÀûÓÃboost¿âÎª¸Ãdatabase´´½¨ÎÄ¼ş*/
+	cout << "åˆ›å»ºæ•°æ®åº“: " << sql_statement.get_database_name() << endl;	
+	string folder_name(path_ + sql_statement.get_database_name());/*è·å–è¯¥databaseåº”è¯¥åˆ›å»ºçš„æ–‡ä»¶åœ°å€*/
+	boost::filesystem::path folder_path(folder_name);/*ã€file systemã€‘åˆ©ç”¨booståº“ä¸ºè¯¥databaseåˆ›å»ºæ–‡ä»¶*/
 
-	if (catalog_manager_->GetDB(sql_statement.get_database_name()) != NULL) throw DatabaseAlreadyExistsException();/*¡¾catalog manager¡¿ÅĞ¶ÏcatalogÖĞÊÇ·ñÒÑ¾­ÓĞ¸Ãdatabase¡£Èç¹ûÓĞ·µ»ØÒì³££¬Èç¹ûÃ»ÓĞ¼ÌĞøÖ´ĞĞ¡£*/
-	if (boost::filesystem::exists(folder_path))/*¡¾file system¡¿ÀûÓÃboost¿âÅĞ¶Ï¸ÃÎÄ¼şµØÖ·ÊÇ·ñÒÑ´æÔÚ¡£´æÔÚÔòÉ¾³ı¡£²»´æÔÚÔò¼ÌĞøÖ´ĞĞ*/
+	if (catalog_manager_->GetDB(sql_statement.get_database_name()) != NULL) throw DatabaseAlreadyExistsException();/*ã€catalog managerã€‘åˆ¤æ–­catalogä¸­æ˜¯å¦å·²ç»æœ‰è¯¥databaseã€‚å¦‚æœæœ‰è¿”å›å¼‚å¸¸ï¼Œå¦‚æœæ²¡æœ‰ç»§ç»­æ‰§è¡Œã€‚*/
+	if (boost::filesystem::exists(folder_path))/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ¤æ–­è¯¥æ–‡ä»¶åœ°å€æ˜¯å¦å·²å­˜åœ¨ã€‚å­˜åœ¨åˆ™åˆ é™¤ã€‚ä¸å­˜åœ¨åˆ™ç»§ç»­æ‰§è¡Œ*/
 	{
-		boost::filesystem::remove_all(folder_path);/*¡¾file system¡¿ÀûÓÃboost¿âÉ¾³ı¸ÃÎÄ¼şµØÖ·¶ÔÓ¦ÎÄ¼ş*/
-		cout << "Êı¾İ¿âÎÄ¼ş¼ĞÒÑ´æÔÚ£¬²¢ÒÑÉ¾³ı¡£" << endl;
+		boost::filesystem::remove_all(folder_path);/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ é™¤è¯¥æ–‡ä»¶åœ°å€å¯¹åº”æ–‡ä»¶*/
+		cout << "æ•°æ®åº“æ–‡ä»¶å¤¹å·²å­˜åœ¨ï¼Œå¹¶å·²åˆ é™¤ã€‚" << endl;
 	}
-	boost::filesystem::create_directories(folder_path);/*¡¾file system¡¿ÀûÓÃboost¿â´´½¨¸ÃÎÄ¼şµØÖ·¶ÔÓ¦ÎÄ¼ş*/
-	cout << "Êı¾İ¿âÎÄ¼ş¼ĞÒÑ´´½¨¡£" << endl;
-	catalog_manager_->CreateDatabase(sql_statement.get_database_name());/*¡¾catalog manager¡¿ÔÚcatalogÖĞ´´½¨¸ÃÊı¾İ¿â*/
-	cout << "Ä¿Â¼¹ÜÀíÒÑĞ´Èë¡£" << endl << endl;
-	catalog_manager_->WriteArchiveFile();/*¡¾catalog manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ*/
+	boost::filesystem::create_directories(folder_path);/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ›å»ºè¯¥æ–‡ä»¶åœ°å€å¯¹åº”æ–‡ä»¶*/
+	cout << "æ•°æ®åº“æ–‡ä»¶å¤¹å·²åˆ›å»ºã€‚" << endl;
+	catalog_manager_->CreateDatabase(sql_statement.get_database_name());/*ã€catalog managerã€‘åœ¨catalogä¸­åˆ›å»ºè¯¥æ•°æ®åº“*/
+	cout << "ç›®å½•ç®¡ç†å·²å†™å…¥ã€‚" << endl<<endl;
+	catalog_manager_->WriteArchiveFile();/*ã€catalog managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£*/
 
-										 /*cout << "´´½¨Êı¾İ¿â:" << sql_statement.get_database_name() << endl;*/
+	/*cout << "åˆ›å»ºæ•°æ®åº“:" << sql_statement.get_database_name() << endl;*/
 }
 
-/*´´½¨Êı¾İ±í ÕÒ³öÒª´´½¨Êı¾İ±íµÄÊı¾İ¿â;²Ù×÷¶ÔÓ¦ÎÄ¼ş;ÀûÓÃcatalog ManagerÊµÏÖ¶ÔÓ¦Êı¾İ±íµÄ´´½¨*/
+/*åˆ›å»ºæ•°æ®è¡¨ æ‰¾å‡ºè¦åˆ›å»ºæ•°æ®è¡¨çš„æ•°æ®åº“;æ“ä½œå¯¹åº”æ–‡ä»¶;åˆ©ç”¨catalog Managerå®ç°å¯¹åº”æ•°æ®è¡¨çš„åˆ›å»º*/
 void API::CreateTable(SQLCreateTable& sql_statement)
 {
-	cout << "´´½¨±í: " << sql_statement.get_table_name() << endl;
-	if (current_database_.length() == 0) throw NoDatabaseSelectedException();/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡ÖĞ*/
+	cout << "åˆ›å»ºè¡¨: " << sql_statement.get_table_name() << endl;
+	if (current_database_.length() == 0) throw NoDatabaseSelectedException();/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰ä¸­*/
 	Database *db = catalog_manager_->GetDB(current_database_);
-	if (db == NULL) throw DatabaseNotExistException();/*¡¾catalog Manager¡¿ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
-	if (db->GetTable(sql_statement.get_table_name()) != NULL) throw TableAlreadyExistsException();/*¡¾catalog Manager¡¿ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÒÑÓĞ¸ÃÊı¾İ±í*/
+	if (db == NULL) throw DatabaseNotExistException();/*ã€catalog Managerã€‘åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
+	if (db->GetTable(sql_statement.get_table_name()) != NULL) throw TableAlreadyExistsException();/*ã€catalog Managerã€‘åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å·²æœ‰è¯¥æ•°æ®è¡¨*/
 
 	string file_name(path_ + current_database_ + "/" + sql_statement.get_table_name() + ".records");
-	boost::filesystem::path folder_path(file_name);/*¡¾file System¡¿ÀûÓÃboost¿âÎª¸Ãtable´´½¨ÎÄ¼ş*/
+	boost::filesystem::path folder_path(file_name);/*ã€file Systemã€‘åˆ©ç”¨booståº“ä¸ºè¯¥tableåˆ›å»ºæ–‡ä»¶*/
 
-	if (boost::filesystem::exists(folder_path))/*¡¾file System¡¿ÀûÓÃboost¿âÅĞ¶Ï¸ÃÎÄ¼şµØÖ·ÊÇ·ñÒÑ´æÔÚ¡£´æÔÚÔòÉ¾³ı¡£²»´æÔÚÔò¼ÌĞøÖ´ĞĞ*/
+	if (boost::filesystem::exists(folder_path))/*ã€file Systemã€‘åˆ©ç”¨booståº“åˆ¤æ–­è¯¥æ–‡ä»¶åœ°å€æ˜¯å¦å·²å­˜åœ¨ã€‚å­˜åœ¨åˆ™åˆ é™¤ã€‚ä¸å­˜åœ¨åˆ™ç»§ç»­æ‰§è¡Œ*/
 	{
-		boost::filesystem::remove_all(folder_path);/*¡¾file System¡¿ÀûÓÃboost¿âÉ¾³ı¸ÃÎÄ¼şµØÖ·¶ÔÓ¦ÎÄ¼ş*/
-		cout << "Êı¾İ±íÎÄ¼şÒÑ´æÔÚ£¬²¢ÒÑÉ¾³ı¡£" << endl;
+		boost::filesystem::remove_all(folder_path);/*ã€file Systemã€‘åˆ©ç”¨booståº“åˆ é™¤è¯¥æ–‡ä»¶åœ°å€å¯¹åº”æ–‡ä»¶*/
+		cout << "æ•°æ®è¡¨æ–‡ä»¶å·²å­˜åœ¨ï¼Œå¹¶å·²åˆ é™¤ã€‚" << endl;
 	}
-	ofstream ofs(file_name);/*¡¾file System¡¿´´½¨¸ÃÎÄ¼şµØÖ·¶ÔÓ¦ÎÄ¼ş*/
+	ofstream ofs(file_name);/*ã€file Systemã€‘åˆ›å»ºè¯¥æ–‡ä»¶åœ°å€å¯¹åº”æ–‡ä»¶*/
 	ofs.close();
-	cout << "Êı¾İ±íÎÄ¼şÒÑ´´½¨¡£" << endl;
+	cout << "æ•°æ®è¡¨æ–‡ä»¶å·²åˆ›å»ºã€‚" << endl;
 
-	db->CreateTable(sql_statement);/*¡¾catalog Manager¡¿ÔÚ¸ÃdatabaseÖĞ´´½¨¸ÃÊı¾İ±í*/
+	db->CreateTable(sql_statement);/*ã€catalog Managerã€‘åœ¨è¯¥databaseä¸­åˆ›å»ºè¯¥æ•°æ®è¡¨*/
 
-	cout << "Ä¿Â¼¹ÜÀíÒÑĞ´Èë" << endl << endl;
-	//¡¾catalog Manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ
+	cout << "ç›®å½•ç®¡ç†å·²å†™å…¥" << endl<<endl;
+	//ã€catalog Managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£
 	catalog_manager_->WriteArchiveFile();
 
-	//cout << "ÔÚµ±Ç°Êı¾İ¿âÖĞ´´½¨Êı¾İ±í" + sql_statement.get_table_name()<< endl;
+	//cout << "åœ¨å½“å‰æ•°æ®åº“ä¸­åˆ›å»ºæ•°æ®è¡¨" + sql_statement.get_table_name()<< endl;
 }
 
-/*´´½¨Ë÷Òı ÕÒ³öÒª´´½¨Ë÷ÒıµÄÊı¾İ¿â;²Ù×÷¶ÔÓ¦ÎÄ¼ş;ÀûÓÃindex managerÊµÏÖ¶ÔÓ¦indexµÄ´´½¨*/
+/*åˆ›å»ºç´¢å¼• æ‰¾å‡ºè¦åˆ›å»ºç´¢å¼•çš„æ•°æ®åº“;æ“ä½œå¯¹åº”æ–‡ä»¶;åˆ©ç”¨index managerå®ç°å¯¹åº”indexçš„åˆ›å»º*/
 void API::CreateIndex(SQLCreateIndex& sql_statement)
 {
-	cout << "´´½¨Ë÷Òı: " << sql_statement.get_index_name() << endl;
+	cout << "åˆ›å»ºç´¢å¼•: " << sql_statement.get_index_name() << endl;
 	if (current_database_.length() == 0) throw NoDatabaseSelectedException();
 
 	Database *db = catalog_manager_->GetDB(current_database_);
@@ -110,63 +111,63 @@ void API::CreateIndex(SQLCreateIndex& sql_statement)
 	IndexManager *im = new IndexManager(catalog_manager_, buffer_manager_, current_database_);
 	im->CreateIndex(sql_statement);
 	delete im;
-	cout << "ÔÚ " + sql_statement.get_tb_name() + " ÖĞ´´½¨Ë÷Òı " + sql_statement.get_index_name() << endl;
+	cout << "åœ¨ "+ sql_statement.get_tb_name()+" ä¸­åˆ›å»ºç´¢å¼• "+ sql_statement.get_index_name()<<endl;
 }
 
-/*ÏÔÊ¾Êı¾İ¿â*/
+/*æ˜¾ç¤ºæ•°æ®åº“*/
 void API::ShowDatabases()
 {
-	vector<Database> dbs = catalog_manager_->GetDBs();/*¡¾catalog manager¡¿»ñÈ¡ËùÓĞÊı¾İ¿â*/
-	if (dbs.size() == 0)/*Èç¹û²»´æÔÚÊı¾İ¿â*/
+	vector<Database> dbs = catalog_manager_->GetDBs();/*ã€catalog managerã€‘è·å–æ‰€æœ‰æ•°æ®åº“*/
+	if (dbs.size() == 0)/*å¦‚æœä¸å­˜åœ¨æ•°æ®åº“*/
 	{
-		cout << "µ±Ç°²»´æÔÚÊı¾İ¿â£¬Çë´´½¨¡£" << endl;
+		cout << "å½“å‰ä¸å­˜åœ¨æ•°æ®åº“ï¼Œè¯·åˆ›å»ºã€‚" << endl;
 		return;
 	}
 	cout << setiosflags(ios::left) << endl;
-	cout << "©³©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©·" << endl;
-	cout << "©¦ " << setw(18) << "Êı¾İ¿â" << " ©¦" << endl;
-	cout << "©Ç©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©Ï" << endl;
+	cout << "â”â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”“" << endl;
+	cout << "â”‚ " << setw(18) << "æ•°æ®åº“" << " â”‚" << endl;
+	cout << "â”£â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”«" << endl;
 	for (auto db = dbs.begin(); db != dbs.end(); db++)
-		cout << "©¦ " << setw(18) << (*db).get_database_name() << " ©¦" << endl;
-	cout << "©¹©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¿" << endl;
-	cout << "¹²ÓĞ£º " << dbs.size() << " ¸öÊı¾İ¿â¡£" << endl;
-	//cout << "ÏÔÊ¾Êı¾İ¿â£º" << endl;
+		cout << "â”‚ " << setw(18) << (*db).get_database_name() << " â”‚" << endl;
+	cout << "â”•â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”›" << endl;
+	cout << "å…±æœ‰ï¼š " << dbs.size() << " ä¸ªæ•°æ®åº“ã€‚" << endl;
+	//cout << "æ˜¾ç¤ºæ•°æ®åº“ï¼š" << endl;
 }
 
-/*ÏÔÊ¾Êı¾İ±í*/
+/*æ˜¾ç¤ºæ•°æ®è¡¨*/
 void API::ShowTables()
 {
-	if (current_database_.size() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.size() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
-	Database *db = catalog_manager_->GetDB(current_database_);/*»ñÈ¡µ±Ç°Êı¾İ¿â*/
-	if (db == NULL)/*¡¾catalog manager¡¿ÅĞ¶Ïµ±Ç°Êı¾İ¿â²»´æÔÚ*/
+	Database *db = catalog_manager_->GetDB(current_database_);/*è·å–å½“å‰æ•°æ®åº“*/
+	if (db == NULL)/*ã€catalog managerã€‘åˆ¤æ–­å½“å‰æ•°æ®åº“ä¸å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
-	if (db->get_tables().size() == 0)/*Èç¹û²»´æÔÚÊı¾İ±í*/
+	if (db->get_tables().size() == 0)/*å¦‚æœä¸å­˜åœ¨æ•°æ®è¡¨*/
 	{
-		cout << "Êı¾İ¿â£º" + db->get_database_name() + " ÖĞ²»´æÔÚÊı¾İ±í¡£Çë´´½¨¡£" << endl;
+		cout <<"æ•°æ®åº“ï¼š" +db->get_database_name()+ " ä¸­ä¸å­˜åœ¨æ•°æ®è¡¨ã€‚è¯·åˆ›å»ºã€‚" << endl;
 		return;
 	}
 	cout << setiosflags(ios::left) << endl;
-	cout << "©³©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©·" << endl;
-	cout << "©¦ " << setw(20) << current_database_ + "ÖĞµÄÊı¾İ±í" << " ©¦" << endl;
-	cout << "©Ç©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©Ï" << endl;
+	cout << "â”â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”“" << endl;
+	cout << "â”‚ " << setw(20) << current_database_+"ä¸­çš„æ•°æ®è¡¨" << " â”‚" << endl;
+	cout << "â”£â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”«" << endl;
 	for (auto tb = db->get_tables().begin(); tb != db->get_tables().end(); tb++)
-		cout << "©¦ " << setw(20) << (*tb).get_tb_name() << " ©¦" << endl;
-	cout << "©¹©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¤©¿" << endl;
-	//cout << "ÏÔÊ¾Êı¾İ±í";
+		cout << "â”‚ " << setw(20) << (*tb).get_tb_name() << " â”‚" << endl;
+	cout << "â”•â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”›" << endl;
+	//cout << "æ˜¾ç¤ºæ•°æ®è¡¨";
 }
 
-/*É¾³ıÊı¾İ¿â*/
+/*åˆ é™¤æ•°æ®åº“*/
 void API::DropDatabase(SQLDropDatabase& sql_statement)
 {
-	cout << "É¾³ıÊı¾İ¿â: " << sql_statement.get_database_name() << endl;
+	cout << "åˆ é™¤æ•°æ®åº“: " << sql_statement.get_database_name() << endl;
 	bool isExist = false;
 
-	vector<Database> dbs = catalog_manager_->GetDBs();/*¡¾catalog manager¡¿»ñÈ¡ËùÓĞÊı¾İ¿â*/
+	vector<Database> dbs = catalog_manager_->GetDBs();/*ã€catalog managerã€‘è·å–æ‰€æœ‰æ•°æ®åº“*/
 	for (auto db = dbs.begin(); db != dbs.end(); db++)
 	{
 		if (db->get_database_name() == sql_statement.get_database_name())
@@ -175,230 +176,251 @@ void API::DropDatabase(SQLDropDatabase& sql_statement)
 			break;
 		}
 	}
-	if (isExist == false)/*ÅĞ¶Ï¸ÃÊı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (isExist == false)/*åˆ¤æ–­è¯¥æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
-	string folder_name(path_ + sql_statement.get_database_name());/*»ñÈ¡¸ÃÊı¾İ¿âµÄÎÄ¼şµØÖ·*/
-	boost::filesystem::path folder_path(folder_name);/*¡¾file system¡¿ÀûÓÃboost¿â»ñÈ¡¸ÃÊı¾İ¿âµÄÎÄ¼şµØÖ·*/
+	string folder_name(path_ + sql_statement.get_database_name());/*è·å–è¯¥æ•°æ®åº“çš„æ–‡ä»¶åœ°å€*/
+	boost::filesystem::path folder_path(folder_name);/*ã€file systemã€‘åˆ©ç”¨booståº“è·å–è¯¥æ•°æ®åº“çš„æ–‡ä»¶åœ°å€*/
 
-	if (!boost::filesystem::exists(folder_path))/*ÅĞ¶Ï¸ÃÎÄ¼şµØÖ·ÎÄ¼şÊÇ·ñ´æÔÚ*/
+	if (!boost::filesystem::exists(folder_path))/*åˆ¤æ–­è¯¥æ–‡ä»¶åœ°å€æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
 	{
-		cout << sql_statement.get_database_name() + " Êı¾İ¿âÎÄ¼ş²»´æÔÚ¡£" << endl;
+		cout << sql_statement.get_database_name()+" æ•°æ®åº“æ–‡ä»¶ä¸å­˜åœ¨ã€‚" << endl;
 	}
 	else
 	{
 		boost::filesystem::remove_all(folder_path);
-		cout << sql_statement.get_database_name() + " Êı¾İ¿âÎÄ¼şÒÑÉ¾³ı¡£" << endl;
+		cout << sql_statement.get_database_name()+" æ•°æ®åº“æ–‡ä»¶å·²åˆ é™¤ã€‚" << endl;
 	}
 
-	catalog_manager_->DeleteDatabase(sql_statement.get_database_name());/*¡¾catalog manager¡¿ÔÚÄ¿Â¼¹ÜÀíÆ÷ÄÚÉ¾³ı¸ÃÊı¾İ¿â*/
-	cout << sql_statement.get_database_name() + " Êı¾İ¿â´ÓÄ¿Â¼ÖĞÉ¾³ı" << endl;
-	catalog_manager_->WriteArchiveFile();/*¡¾catalog manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ*/
+	catalog_manager_->DeleteDatabase(sql_statement.get_database_name());/*ã€catalog managerã€‘åœ¨ç›®å½•ç®¡ç†å™¨å†…åˆ é™¤è¯¥æ•°æ®åº“*/
+	cout << sql_statement.get_database_name()+ " æ•°æ®åº“ä»ç›®å½•ä¸­åˆ é™¤" << endl;
+	catalog_manager_->WriteArchiveFile();/*ã€catalog managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£*/
 
-	if (sql_statement.get_database_name() == current_database_)/*Èç¹ûµ±Ç°Ñ¡¶¨µÄÊı¾İ¿âÊÇ¸ÃÊı¾İ¿â£¬ÔòÑ¡¶¨Ê§Ğ§*/
+	if (sql_statement.get_database_name() == current_database_)/*å¦‚æœå½“å‰é€‰å®šçš„æ•°æ®åº“æ˜¯è¯¥æ•°æ®åº“ï¼Œåˆ™é€‰å®šå¤±æ•ˆ*/
 	{
 		current_database_ = "";
 		delete buffer_manager_;
 	}
-	//cout << "É¾³ıÊı¾İ¿â¡£" << endl;
+	//cout << "åˆ é™¤æ•°æ®åº“ã€‚" << endl;
 }
 
-/*É¾³ıÊı¾İ±í*/
+/*åˆ é™¤æ•°æ®è¡¨*/
 void API::DropTable(SQLDropTable& sql_statement)
 {
 	cout << "Droping table: " << sql_statement.get_table_name() << endl;
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 
 	Database *db = catalog_manager_->GetDB(current_database_);
-	if (db == NULL)/*ÅĞ¶Ï¸Ãµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (db == NULL)/*åˆ¤æ–­è¯¥å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
 
 	Table *tb = db->GetTable(sql_statement.get_table_name());
-	if (tb == NULL)/*ÅĞ¶Ï¸ÃÊı¾İ¿âÊÇ·ñ´æÔÚÊı¾İ±í*/
+	if (tb == NULL)/*åˆ¤æ–­è¯¥æ•°æ®åº“æ˜¯å¦å­˜åœ¨æ•°æ®è¡¨*/
 	{
 		throw TableNotExistException();
 	}
-	string file_name(path_ + current_database_ + "/" + sql_statement.get_table_name() + ".records");/*»ñÈ¡¸ÃÊı¾İ±íµÄÎÄ¼şµØÖ·*/
+	string file_name(path_ + current_database_ + "/" + sql_statement.get_table_name() + ".records");/*è·å–è¯¥æ•°æ®è¡¨çš„æ–‡ä»¶åœ°å€*/
 
-	if (!boost::filesystem::exists(file_name))/*¡¾file system¡¿ÀûÓÃboost¿âÅĞ¶Ï¸ÃÎÄ¼şÊÇ·ñ´æÔÚ*/
+	if (!boost::filesystem::exists(file_name))/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ¤æ–­è¯¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
 	{
-		cout << sql_statement.get_table_name() + " Êı¾İ±íÎÄ¼ş²»´æÔÚ¡£" << endl;
+		cout << sql_statement.get_table_name() +" æ•°æ®è¡¨æ–‡ä»¶ä¸å­˜åœ¨ã€‚" << endl;
 	}
 	else
 	{
-		boost::filesystem::remove(file_name);/*¡¾file system¡¿ÀûÓÃboost¿âÉ¾³ı¸ÃÎÄ¼ş*/
-		cout << sql_statement.get_table_name() + "Êı¾İ±íÎÄ¼şÒÑÉ¾³ı¡£" << endl;
+		boost::filesystem::remove(file_name);/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ é™¤è¯¥æ–‡ä»¶*/
+		cout << sql_statement.get_table_name() + "æ•°æ®è¡¨æ–‡ä»¶å·²åˆ é™¤ã€‚" << endl;
 	}
 
-	cout << "É¾³ıÊı¾İ±íÏÂË÷ÒıÎÄ¼ş¡£" << endl;
+	cout << "åˆ é™¤æ•°æ®è¡¨ä¸‹ç´¢å¼•æ–‡ä»¶ã€‚" << endl;
 	for (unsigned int i = 0; i < tb->GetIndexNum(); i++)
 	{
-		string file_name(path_ + current_database_ + "/" + tb->GetIndex(i)->get_name() + ".index");/*»ñÈ¡¸ÃÊı¾İ±íµÄÎÄ¼şµØÖ·*/
-		if (!boost::filesystem::exists(file_name))/*¡¾file system¡¿ÀûÓÃboost¿âÅĞ¶Ï¸ÃÎÄ¼şÊÇ·ñ´æÔÚ*/
+		string file_name(path_ + current_database_ + "/" + tb->GetIndex(i)->get_name() + ".index");/*è·å–è¯¥æ•°æ®è¡¨çš„æ–‡ä»¶åœ°å€*/
+		if (!boost::filesystem::exists(file_name))/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ¤æ–­è¯¥æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
 		{
-			cout << "Ë÷ÒıÎÄ¼ş²»´æÔÚ¡£" << endl;
+			cout << "ç´¢å¼•æ–‡ä»¶ä¸å­˜åœ¨ã€‚" << endl;
 		}
 		else
 		{
 			boost::filesystem::remove(file_name);
-			cout << "Ë÷ÒıÎÄ¼şÒÑÉ¾³ı" << endl;
+			cout << "ç´¢å¼•æ–‡ä»¶å·²åˆ é™¤" << endl;
 		}
 	}
 
-	db->DropTable(sql_statement);/*¡¾catalog manager¡¿ÔÚÄ¿Â¼ÖĞÉ¾³ı¸ÃÊı¾İ±í*/
-	cout << "Ä¿Â¼ÎÄ¼şÒÑĞ´Èë¡£" << endl;
-	catalog_manager_->WriteArchiveFile();/*¡¾catalog manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ*/
-										 //cout << "É¾³ıÊı¾İ±í¡£" << endl;
+	db->DropTable(sql_statement);/*ã€catalog managerã€‘åœ¨ç›®å½•ä¸­åˆ é™¤è¯¥æ•°æ®è¡¨*/
+	cout << "ç›®å½•æ–‡ä»¶å·²å†™å…¥ã€‚" << endl;
+	catalog_manager_->WriteArchiveFile();/*ã€catalog managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£*/
+	//cout << "åˆ é™¤æ•°æ®è¡¨ã€‚" << endl;
 }
 
-/*É¾³ıË÷Òı*/
+/*åˆ é™¤ç´¢å¼•*/
 void API::DropIndex(SQLDropIndex& sql_statement)
 {
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 	Database *db = catalog_manager_->GetDB(current_database_);
-	if (db == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (db == NULL)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
-	if (!db->CheckIfIndexExists(sql_statement.get_index_name()))/*¡¾catalog manager¡¿ÅĞ¶ÏindexÊÇ·ñ´æÔÚ*/
+	if (!db->CheckIfIndexExists(sql_statement.get_index_name()))/*ã€catalog managerã€‘åˆ¤æ–­indexæ˜¯å¦å­˜åœ¨*/
 	{
 		throw IndexNotExistException();
 	}
-	string file_name(path_ + current_database_ + "/" + sql_statement.get_index_name() + ".index");/*¡¾file system¡¿»ñÈ¡ÎÄ¼şµØÖ·*/
-	if (!boost::filesystem::exists(file_name))/*¡¾file system¡¿ÀûÓÃboost¿âÅĞ¶Ïµ±Ç°ÎÄ¼şÊÇ·ñ´æÔÚ*/
+	string file_name(path_ + current_database_ + "/" + sql_statement.get_index_name() + ".index");/*ã€file systemã€‘è·å–æ–‡ä»¶åœ°å€*/
+	if (!boost::filesystem::exists(file_name))/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ¤æ–­å½“å‰æ–‡ä»¶æ˜¯å¦å­˜åœ¨*/
 	{
-		cout << "Ë÷ÒıÎÄ¼ş²»´æÔÚ" << endl;
+		cout << "ç´¢å¼•æ–‡ä»¶ä¸å­˜åœ¨" << endl;
 		return;
 	}
-	boost::filesystem::remove(file_name);/*¡¾file system¡¿ÀûÓÃboost¿âÉ¾³ıÎÄ¼şµØÖ·¶ÔÓ¦ÎÄ¼ş*/
-	cout << "Ë÷ÒıÎÄ¼şÒÑÉ¾³ı¡£" << endl;
+	boost::filesystem::remove(file_name);/*ã€file systemã€‘åˆ©ç”¨booståº“åˆ é™¤æ–‡ä»¶åœ°å€å¯¹åº”æ–‡ä»¶*/
+	cout << "ç´¢å¼•æ–‡ä»¶å·²åˆ é™¤ã€‚" << endl;
 
-	db->DropIndex(sql_statement);/*¡¾catalog manager¡¿Ä¿Â¼½á¹¹ÖĞÉ¾³ıË÷Òı*/
-	cout << "Ä¿Â¼ÎÄ¼şÒÑĞ´Èë¡£" << endl;
-	catalog_manager_->WriteArchiveFile();/*¡¾catalog manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ*/
-										 //cout << "É¾³ıË÷Òı¡£" << endl;
+	db->DropIndex(sql_statement);/*ã€catalog managerã€‘ç›®å½•ç»“æ„ä¸­åˆ é™¤ç´¢å¼•*/
+	cout << "ç›®å½•æ–‡ä»¶å·²å†™å…¥ã€‚" << endl;
+	catalog_manager_->WriteArchiveFile();/*ã€catalog managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£*/
+	//cout << "åˆ é™¤ç´¢å¼•ã€‚" << endl;
 }
 
-/*Ñ¡¶¨µ±Ç°Êı¾İ¿â*/
+/*é€‰å®šå½“å‰æ•°æ®åº“*/
 void API::Use(SQLUse& sql_statement)
 {
-	cout << "½øÈë " + sql_statement.get_database_name() + " Êı¾İ¿âÖĞ¡£" << endl;
+	cout << "è¿›å…¥ "+ sql_statement .get_database_name()+" æ•°æ®åº“ä¸­ã€‚"<< endl;
 	Database *db = catalog_manager_->GetDB(sql_statement.get_database_name());
-	if (db == NULL)/*µ±Ç°Êı¾İ¿â²»´æÔÚ*/
+	if (db == NULL)/*å½“å‰æ•°æ®åº“ä¸å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
-	if (current_database_.length() != 0)/*Ñ¡¶¨ĞÂµÄÊı¾İ¿âÖ®Ç°ÒÑÑ¡¶¨¾ÉÊı¾İ¿â*/
+	if (current_database_.length() != 0)/*é€‰å®šæ–°çš„æ•°æ®åº“ä¹‹å‰å·²é€‰å®šæ—§æ•°æ®åº“*/
 	{
-		cout << "¹Ø±ÕÒÑÑ¡¶¨Êı¾İ¿â£º" << current_database_ << endl;
-		catalog_manager_->WriteArchiveFile();/*¡¾catalog manager¡¿ÔÚcatalogÖĞĞ´ÎÄµµ*/
+		cout << "å…³é—­å·²é€‰å®šæ•°æ®åº“ï¼š" << current_database_ << endl;
+		catalog_manager_->WriteArchiveFile();/*ã€catalog managerã€‘åœ¨catalogä¸­å†™æ–‡æ¡£*/
 		delete buffer_manager_;
 	}
-	current_database_ = sql_statement.get_database_name();/*¸üĞÂµ±Ç°Êı¾İ¿â*/
-	buffer_manager_ = new BufferManager(path_);/*¸üĞÂ»º´æ¹ÜÀíÆ÷*/
-	cout << endl << "Êı¾İ¿â" + sql_statement.get_database_name() + "ÒÑ½øÈë¡£" << endl;
-	cout << "Ñ¡ÔñÊı¾İ¿â" << endl << endl;
+	current_database_ = sql_statement.get_database_name();/*æ›´æ–°å½“å‰æ•°æ®åº“*/
+	buffer_manager_ = new BufferManager(path_);/*æ›´æ–°ç¼“å­˜ç®¡ç†å™¨*/
+	cout << endl << "æ•°æ®åº“" + sql_statement.get_database_name() + "å·²è¿›å…¥ã€‚" << endl;
+	cout << "é€‰æ‹©æ•°æ®åº“" << endl<<endl;
 }
 
-/*²åÈëÊı¾İ*/
+/*æ’å…¥æ•°æ®*/
 void API::Insert(SQLInsert& sql_statement)
 {
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 	Database *db = catalog_manager_->GetDB(current_database_);
-	if (db == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (db == NULL)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
 	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
 	rm->Insert(sql_statement);
 	delete rm;
-	//cout << "²åÈëÊı¾İ¡£";
+	//cout << "æ’å…¥æ•°æ®ã€‚";
 }
 
-/*²éÑ¯Êı¾İ*/
+/*æŸ¥è¯¢æ•°æ®*/
 void API::Select(SQLSelect& sql_statement)
 {
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 	Table *tb = catalog_manager_->GetDB(current_database_)->GetTable(sql_statement.get_tb_name());
-	if (tb == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (tb == NULL)/*åˆ¤æ–­å½“å‰è¡¨æ˜¯å¦å­˜åœ¨*/
 	{
 		throw TableNotExistException();
 	}
 	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
-	rm->Select(sql_statement);
+	vector<vector<TKey>>result;
+	result = rm->Select(sql_statement);
 	delete rm;
-	//cout << "²éÑ¯Êı¾İ" << endl;
+	//cout << "æŸ¥è¯¢æ•°æ®" << endl;
 }
 
-/*join²éÑ¯*/
+//æŸ¥è¯¢æ•°æ®
+//void API::Select(SQLSelect& sql_statement)
+//{
+//	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
+//	{
+//		throw NoDatabaseSelectedException();
+//	}
+//	Table *tb = catalog_manager_->GetDB(current_database_)->GetTable(sql_statement.get_tb_name());
+//	if (tb == NULL)/*åˆ¤æ–­å½“å‰è¡¨æ˜¯å¦å­˜åœ¨*/
+//	{
+//		throw TableNotExistException();
+//	}
+//	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
+//	rm->Select(sql_statement);
+//	delete rm;
+//	//cout << "æŸ¥è¯¢æ•°æ®" << endl;
+//}
+
+/*joinæŸ¥è¯¢*/
 void API::JoinSelect(SQLJoinSelect& sql_statement)
 {
-	//if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
-	//{
-	//	throw NoDatabaseSelectedException();
-	//}
-	//Table *tb = catalog_manager_->GetDB(current_database_)->GetTable(sql_statement.get_tb_name());
-	//if (tb == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
-	//{
-	//	throw TableNotExistException();
-	//}
-	//RecordManager *rm = new RecordManager(catalog_manager_, catalog_manager_, current_database_);
-	//rm->JoinSelect(sql_statement);
-	//delete rm;
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
+	{
+		throw NoDatabaseSelectedException();
+	}
+	int table_count = sql_statement.get_table_names().size();
+	for (int i = 0; i < table_count; i++)
+	{
+		Table *tb = catalog_manager_->GetDB(current_database_)->GetTable(sql_statement.get_table_names()[i]);
+		if (tb == NULL)
+			throw TableNotExistException();
+	}
+	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
+	rm->JoinSelect(sql_statement);
+	delete rm;
 }
 
-/*É¾³ıÊı¾İ*/
+/*åˆ é™¤æ•°æ®*/
 void API::Delete(SQLDelete& sql_statement)
 {
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 	Table *tb = catalog_manager_->GetDB(current_database_)->GetTable(sql_statement.get_tb_name());
-	if (tb == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (tb == NULL)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw TableNotExistException();
 	}
 	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
 	rm->Delete(sql_statement);
 	delete rm;
-	//cout << "É¾³ıÊı¾İ" << endl;
+	//cout << "åˆ é™¤æ•°æ®" << endl;
 }
 
-/*¸üĞÂÊı¾İ*/
+/*æ›´æ–°æ•°æ®*/
 void API::Update(SQLUpdate& sql_statement)
 {
-	if (current_database_.length() == 0)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñÑ¡¶¨*/
+	if (current_database_.length() == 0)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦é€‰å®š*/
 	{
 		throw NoDatabaseSelectedException();
 	}
 	Database *db = catalog_manager_->GetDB(current_database_);
-	if (db == NULL)/*ÅĞ¶Ïµ±Ç°Êı¾İ¿âÊÇ·ñ´æÔÚ*/
+	if (db == NULL)/*åˆ¤æ–­å½“å‰æ•°æ®åº“æ˜¯å¦å­˜åœ¨*/
 	{
 		throw DatabaseNotExistException();
 	}
 	Table *tb = db->GetTable(sql_statement.get_tb_name());
-	if (tb == NULL)/*ÅĞ¶ÏÊı¾İ±íÊÇ·ñ´æÔÚÊÇ·ñ´æÔÚ*/
+	if (tb == NULL)/*åˆ¤æ–­æ•°æ®è¡¨æ˜¯å¦å­˜åœ¨æ˜¯å¦å­˜åœ¨*/
 	{
 		throw TableNotExistException();
 	}
 	RecordManager *rm = new RecordManager(catalog_manager_, buffer_manager_, current_database_);
 	rm->Update(sql_statement);
 	delete rm;
-	//cout << "¸üĞÂÊı¾İ" << endl;
+	//cout << "æ›´æ–°æ•°æ®" << endl;
 }
